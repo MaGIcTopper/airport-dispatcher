@@ -1,115 +1,93 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ATC — Диспетчер аэропорта</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ATC PRO — Airport Tower</title>
 <style>
-:root{--bg:#07111f;--panel:#101f31;--line:#25415a;--cyan:#53d9e8;--green:#58e39b;--red:#ff647c;--yellow:#ffd166;--muted:#8ba4bb}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% -20%,#183651,#07111f 55%);color:#eaf5ff;font-family:Inter,system-ui,Arial,sans-serif;min-height:100vh}
-header{display:flex;justify-content:space-between;align-items:center;padding:18px 24px;border-bottom:1px solid var(--line);background:#081522cc;gap:16px;flex-wrap:wrap}
-.brand{font-weight:900;letter-spacing:2px}.brand span{color:var(--cyan)}.sub{color:var(--muted);font-size:12px;margin-top:4px}
-.stats{display:flex;gap:10px;flex-wrap:wrap}.stat{background:#102238;border:1px solid var(--line);padding:9px 14px;border-radius:12px;min-width:90px}.stat small{display:block;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:1px}.stat b{font-size:19px}
-main{max-width:1400px;margin:auto;padding:20px;display:grid;grid-template-columns:minmax(0,1.7fr) minmax(280px,.8fr);gap:18px}
-.panel{background:linear-gradient(145deg,#11243a,#0b1929);border:1px solid var(--line);border-radius:17px;overflow:hidden;box-shadow:0 16px 40px #0003}.panel-head{padding:14px 17px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.panel-head h2{font-size:13px;letter-spacing:1.5px;margin:0}.live{color:var(--green);font-size:11px}
-#radar{display:block;width:100%;height:auto;aspect-ratio:1.45;background:#071b25}
-.legend{display:flex;gap:15px;padding:12px 16px;color:var(--muted);font-size:11px;flex-wrap:wrap}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px}
-.side{display:flex;flex-direction:column;gap:18px}.flight-list{padding:8px;display:flex;flex-direction:column;gap:7px;max-height:300px;overflow:auto}.flight{display:grid;grid-template-columns:1fr auto;gap:6px;background:#0b1b2b;border:1px solid #1d354b;border-radius:11px;padding:10px;cursor:pointer}.flight.selected{border-color:var(--cyan);background:#123047}.flight strong{font-size:13px}.flight small{display:block;color:var(--muted);font-size:11px;margin-top:3px}.tag{font-size:10px;padding:4px 7px;border-radius:20px;background:#183b4a;color:var(--cyan);height:max-content}
-.controls{padding:15px;display:grid;grid-template-columns:1fr 1fr;gap:9px}.controls button,.primary{border:1px solid #31516a;border-radius:10px;padding:11px 9px;background:#142b40;color:#eaf5ff;font-weight:700;cursor:pointer;transition:.15s}.controls button:hover,.primary:hover{transform:translateY(-1px);border-color:var(--cyan);background:#1b3d55}.controls button:disabled{opacity:.35;cursor:not-allowed;transform:none}.controls .go{background:#0f493d;border-color:#23775f;color:#9bffd1}.controls .warn{background:#472333;border-color:#8e3b53;color:#ff9cac}
-.info{padding:14px 16px;color:var(--muted);font-size:12px;line-height:1.6}.info b{color:#eaf5ff}.message{margin:0 14px 14px;padding:11px;border-radius:10px;background:#0a1b2a;color:var(--cyan);font-size:12px;min-height:40px}
-footer{text-align:center;color:#58728a;font-size:11px;padding:4px 20px 25px}
-@media(max-width:850px){main{grid-template-columns:1fr;padding:12px}.side{display:grid;grid-template-columns:1fr 1fr}.side .panel:first-child{grid-column:1/-1}}
-@media(max-width:520px){.side{display:flex}.stats{width:100%}.stat{flex:1}.panel-head{padding:12px}.controls{padding:10px}}
-</style>
-</head>
+:root{--bg:#06101c;--panel:#0d1d2c;--panel2:#11263a;--line:#24435b;--cyan:#63e4f2;--green:#5ce0a0;--amber:#ffcf70;--red:#ff667d;--muted:#89a5bb}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -30%,#214563 0,#0a1b2b 42%,#050d17 100%);color:#eaf6ff;font:14px Inter,system-ui,Arial;min-height:100vh}
+header{height:auto;min-height:76px;padding:13px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px;border-bottom:1px solid #29465d;background:#071421eF;position:sticky;top:0;z-index:5}
+.logo{font-weight:950;letter-spacing:2px;font-size:18px}.logo span{color:var(--cyan)}.sub{font-size:10px;color:var(--muted);letter-spacing:1.5px;margin-top:3px}
+.metrics{display:flex;gap:8px;flex-wrap:wrap}.metric{background:#10253a;border:1px solid var(--line);border-radius:10px;padding:7px 12px;min-width:82px}.metric small{display:block;color:var(--muted);font-size:9px;letter-spacing:1px;text-transform:uppercase}.metric b{font-size:17px;font-variant-numeric:tabular-nums}
+main{max-width:1500px;margin:auto;padding:18px;display:grid;grid-template-columns:minmax(0,1.65fr) minmax(320px,.85fr);gap:15px}
+.panel{background:linear-gradient(150deg,#10253a,#0a1827);border:1px solid var(--line);border-radius:15px;overflow:hidden;box-shadow:0 15px 35px #0004}
+.head{padding:12px 15px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}.head h2{font-size:11px;letter-spacing:1.6px;margin:0}.live{font-size:10px;color:var(--green)}
+.visual{position:relative;background:#071722}.visual canvas{display:block;width:100%;height:auto;aspect-ratio:1.45;cursor:crosshair}
+.overlay{position:absolute;left:12px;top:12px;padding:7px 9px;border:1px solid #31556a;background:#071824c9;border-radius:8px;color:#a8c7d9;font:10px monospace;pointer-events:none}
+.bottomline{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;padding:10px 14px;color:var(--muted);font-size:10px;border-top:1px solid #1d394e}
+.right{display:flex;flex-direction:column;gap:15px}.list{padding:8px;display:grid;gap:6px;max-height:260px;overflow:auto}.flight{display:flex;justify-content:space-between;gap:10px;padding:9px 10px;background:#091a29;border:1px solid #1b354a;border-radius:9px;cursor:pointer}.flight.active{border-color:var(--cyan);background:#123047}.flight strong{font-size:12px}.flight small{display:block;color:var(--muted);font-size:10px;margin-top:3px}.pill{font-size:9px;padding:4px 7px;border-radius:20px;height:max-content;background:#18384a;color:var(--cyan);white-space:nowrap}.pill.red{background:#4a2030;color:#ff9dad}.pill.green{background:#123c31;color:#82f4bb}.pill.gold{background:#46391f;color:#ffdc91}
+.detail{padding:12px 14px;color:var(--muted);font-size:11px;line-height:1.65;min-height:80px}.detail b{color:#f2f8ff}.actions{padding:0 12px 12px;display:grid;grid-template-columns:1fr 1fr;gap:7px}.actions button,.topbtn{border:1px solid #31536c;background:#142c42;color:#e9f7ff;border-radius:8px;padding:10px 8px;font-weight:750;font-size:11px;cursor:pointer}.actions button:hover,.topbtn:hover{border-color:var(--cyan);background:#1a3a52}.actions button:disabled{opacity:.35;cursor:not-allowed}.actions .ok{background:#104536;border-color:#28765c;color:#9cffcf}.actions .bad{background:#482333;border-color:#8a4053;color:#ff9eae}
+.message{margin:0 12px 12px;padding:9px 11px;background:#071824;border:1px solid #1b394e;border-radius:8px;color:var(--cyan);font-size:10px;min-height:34px}
+.settings{padding:11px 13px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:10px}.settings select{background:#0a1b2a;color:#eaf6ff;border:1px solid #31516a;border-radius:7px;padding:7px}
+.log{padding:10px 13px;max-height:120px;overflow:auto;font:10px/1.7 monospace;color:#9cb6c8}.log div{border-bottom:1px solid #173047;padding:2px 0}
+footer{text-align:center;padding:5px 20px 22px;color:#607c91;font-size:10px}
+@media(max-width:900px){main{grid-template-columns:1fr}.right{display:grid;grid-template-columns:1fr 1fr}.right .panel:first-child{grid-column:1/-1}}
+@media(max-width:560px){header{align-items:flex-start;flex-direction:column}.metrics{width:100%}.metric{flex:1}.right{display:flex}main{padding:10px}.visual canvas{aspect-ratio:1.05}}
+</style></head>
 <body>
-<header>
- <div><div class="brand">✈ ATC <span>CONTROL</span></div><div class="sub">МЕЖДУНАРОДНЫЙ АЭРОПОРТ · СИМУЛЯТОР ДИСПЕТЧЕРА</div></div>
- <div class="stats">
-  <div class="stat"><small>Очки</small><b id="score">0</b></div>
-  <div class="stat"><small>Рейс выполнен</small><b id="done">0</b></div>
-  <div class="stat"><small>Трафик</small><b id="traffic">Низкий</b></div>
-  <div class="stat"><small>Время</small><b id="clock">08:00</b></div>
- </div>
-</header>
+<header><div><div class="logo">✈ ATC <span>PRO</span></div><div class="sub">AIR TRAFFIC CONTROL · INTERNATIONAL AIRPORT</div></div>
+<div class="metrics"><div class="metric"><small>Рейтинг</small><b id="score">0</b></div><div class="metric"><small>Обслужено</small><b id="served">0</b></div><div class="metric"><small>Погода</small><b id="weather">Ясно</b></div><div class="metric"><small>Местное время</small><b id="clock">08:00</b></div></div></header>
 <main>
- <section class="panel">
-  <div class="panel-head"><h2>РАДАР ВОЗДУШНОГО ДВИЖЕНИЯ</h2><span class="live">● LIVE SIMULATION</span></div>
-  <canvas id="radar" width="900" height="620"></canvas>
-  <div class="legend"><span><i class="dot" style="background:#53d9e8"></i>В воздухе</span><span><i class="dot" style="background:#58e39b"></i>Посадка</span><span><i class="dot" style="background:#ffd166"></i>Ожидание</span><span><i class="dot" style="background:#ff647c"></i>Опасность</span></div>
- </section>
- <div class="side">
-  <section class="panel"><div class="panel-head"><h2>ТАБЛО РЕЙСОВ</h2><span class="live" id="flightCount">0 рейсов</span></div><div class="flight-list" id="flights"></div></section>
-  <section class="panel"><div class="panel-head"><h2>УПРАВЛЕНИЕ РЕЙСОМ</h2><span class="live" id="selectedLabel">НЕ ВЫБРАН</span></div>
-   <div class="info" id="details">Выбери самолёт на радаре или в табло, чтобы отдавать команды.</div>
-   <div class="controls">
-    <button id="land" class="go" disabled>🛬 Посадка</button><button id="hold" disabled>⏸ Круг</button>
-    <button id="takeoff" class="go" disabled>🛫 Взлёт</button><button id="cancel" class="warn" disabled>✕ Сбросить</button>
-   </div><p class="message" id="message">Диспетчерская готова. Удачной смены!</p>
-  </section>
- </div>
-</main>
-<footer>ATC CONTROL · Учебная аркадная симуляция. Все рейсы вымышлены.</footer>
+<section class="panel"><div class="head"><h2>РАДАР + СХЕМА АЭРОПОРТА</h2><span class="live">● СИМУЛЯЦИЯ АКТИВНА</span></div>
+<div class="visual"><canvas id="screen" width="1000" height="690"></canvas><div class="overlay">TWR 118.700 MHz<br>SECTOR: ALPHA / BRAVO</div></div>
+<div class="bottomline"><span>● Голубой — в воздухе　 ● Зелёный — заход　 ● Жёлтый — ожидание　 ● Красный — конфликт</span><span id="traffic">Трафик: низкий</span></div></section>
+<div class="right">
+<section class="panel"><div class="head"><h2>ПАНЕЛЬ РЕЙСОВ</h2><span class="live" id="count">0 бортов</span></div><div class="list" id="flights"></div></section>
+<section class="panel"><div class="head"><h2>КОМАНДЫ ДИСПЕТЧЕРА</h2><span class="live" id="picked">НЕТ ВЫБОРА</span></div>
+<div class="detail" id="detail">Выберите борт на радаре или в списке. Затем выдайте разрешение на посадку, отправьте его в зону ожидания или разрешите взлёт.</div>
+<div class="actions"><button class="ok" id="approach" disabled>🛬 Заход на посадку</button><button id="hold" disabled>⏱ Зона ожидания</button><button class="ok" id="takeoff" disabled>🛫 Разрешить взлёт</button><button id="goaround" disabled>↗ Уход на второй круг</button><button id="weatherBtn">🌦 Сменить погоду</button><button class="bad" id="reset">↻ Новая смена</button></div>
+<div class="message" id="message">Смена началась. Проверьте радар и принимайте входящие рейсы.</div></section>
+<section class="panel"><div class="head"><h2>ЖУРНАЛ ДИСПЕТЧЕРА</h2><span class="live">REC</span></div><div class="log" id="log"></div></section>
+<section class="panel"><div class="head"><h2>ПАРАМЕТРЫ СМЕНЫ</h2></div><div class="settings"><label>Сложность <select id="difficulty"><option value="1">Курсант</option><option value="1.35" selected>Обычная</option><option value="1.8">Профессионал</option></select></label><label><input type="checkbox" id="sound" checked> Звуковые сигналы</label><span>Цель: безопасно обслужить рейсы</span></div></section>
+</div></main><footer>ATC PRO · Аркадный авиадиспетчерский симулятор. Не является учебным средством для реального управления воздушным движением.</footer>
 <script>
-const canvas=document.getElementById('radar'),ctx=canvas.getContext('2d');
-const $=id=>document.getElementById(id);
-let planes=[],selected=null,score=0,done=0,minutes=0,spawn=0,gameOver=false;
-const names=['AER 214','SKY 508','JET 031','NORD 772','WST 119','EAG 640','FLY 225','AIR 903'];
-const colors={air:'#53d9e8',landing:'#58e39b',hold:'#ffd166',danger:'#ff647c'};
-function say(t){$('message').textContent=t}
-function addPlane(){
- const side=Math.floor(Math.random()*4),p={id:Math.random().toString(36).slice(2,8),name:names[Math.floor(Math.random()*names.length)],x:side===0?30:side===1?870:Math.random()*840+30,y:side===2?30:side===3?590:Math.random()*560+30,tx:450,ty:315,state:'air',age:0,dir:Math.random()*6.28,spd:0.55+Math.random()*.35};
- p.tx=side===0?450:side===1?450:side===2?450:450;p.ty=side===2?315:side===3?315:315;
- planes.push(p);renderFlights();
-}
-function select(p){selected=p;$('selectedLabel').textContent=p?p.name:'НЕ ВЫБРАН';$('land').disabled=!p;$('hold').disabled=!p;$('takeoff').disabled=!p;$('cancel').disabled=!p;
- $('details').innerHTML=p?`<b>${p.name}</b><br>Статус: ${status(p)}<br>Координаты: ${Math.round(p.x)}, ${Math.round(p.y)}<br>Время в зоне: ${Math.floor(p.age)} сек.`:'Выбери самолёт на радаре или в табло, чтобы отдавать команды.';renderFlights();}
-function status(p){return {air:'В воздушной зоне',landing:'Заходит на посадку',hold:'Выполняет круг',danger:'Опасное сближение',depart:'Взлетает'}[p.state]||p.state}
-function command(cmd){if(!selected)return;const p=selected;
- if(cmd==='land'){p.state='landing';p.tx=450;p.ty=500;say(`${p.name}: разрешена посадка на ВПП 1.`)}
- if(cmd==='hold'){p.state='hold';p.tx=450+Math.cos(p.dir)*180;p.ty=300+Math.sin(p.dir)*150;say(`${p.name}: следуйте в зону ожидания.`)}
- if(cmd==='takeoff'){if(p.state!=='parked'){say('Взлёт разрешён только самолёту на земле.');return}p.state='depart';p.tx=450;p.ty=-50;say(`${p.name}: взлёт разрешён!`)}
- if(cmd==='cancel'){planes=planes.filter(x=>x!==p);select(null);say('Рейс удалён из симуляции.');}
- renderFlights();}
-$('land').onclick=()=>command('land');$('hold').onclick=()=>command('hold');$('takeoff').onclick=()=>command('takeoff');$('cancel').onclick=()=>command('cancel');
-function renderFlights(){
- $('flightCount').textContent=planes.length+' рейсов';$('flights').innerHTML='';
- planes.forEach(p=>{const d=document.createElement('div');d.className='flight'+(p===selected?' selected':'');d.innerHTML=`<div><strong>${p.name}</strong><small>${status(p)}</small></div><span class="tag">${p.state==='landing'?'APP':p.state==='parked'?'GROUND':p.state==='depart'?'DEP':'RADAR'}</span>`;d.onclick=()=>select(p);$('flights').appendChild(d)});
-}
+const c=document.querySelector('#screen'),g=c.getContext('2d'),$=id=>document.getElementById(id);
+let aircraft=[],chosen=null,score=0,served=0,minute=0,spawn=0,weather='Ясно',wind=0,logs=[],lastTick=0;
+const calls=['DLH 482','SAS 117','AFL 920','BAW 031','KLM 668','LOT 214','EZY 551','UAE 073','RYR 808','AFR 390'];
+const colors={air:'#65dff0',approach:'#5de5a4',hold:'#ffd16e,conflict:'#ff637c',ground:'#8ba5bb',depart:'#b7a0ff'};
+function log(s){let t=`${String(8+Math.floor(minute/60)).padStart(2,'0')}:${String(minute%60).padStart(2,'0')}`;logs.unshift(`<div>[${t}] ${s}</div>`);logs=logs.slice(0,12);$('log').innerHTML=logs.join('')}
+function msg(s){$('message').textContent=s;log(s)}
+function add(){let edge=Math.floor(Math.random()*4),x=edge===0?20:edge===1?980:Math.random()*900+50,y=edge===2?20:edge===3?670:Math.random()*620+30;
+let p={id:Math.random(),call:calls[Math.floor(Math.random()*calls.length)],x,y,tx:500,ty:350,state:'air',age:0,speed:(.65+Math.random()*.25)*Number($('difficulty').value),heading:0,alt:Math.round(2500+Math.random()*6500),fuel:100,route:Math.random()<.5?'NORTH':'SOUTH'};
+p.tx=500;p.ty=350;aircraft.push(p);log(`Входящий борт ${p.call}, эшелон FL${Math.round(p.alt/100)}.`);render()}
+function select(p){chosen=p;$('picked').textContent=p?p.call:'НЕТ ВЫБОРА';['approach','hold','takeoff','goaround'].forEach(id=>$(id).disabled=!p);
+$('detail').innerHTML=p?`<b>${p.call}</b><br>Статус: ${status(p)}<br>Эшелон: FL${Math.round(p.alt/100)} · Топливо: ${Math.max(0,Math.round(p.fuel))}%<br>Маршрут: ${p.route} · Время в секторе: ${p.age} сек.`:'Выберите борт на радаре или в списке.';render()}
+function status(p){return {air:'Входящий / в секторе',approach:'На глиссаде — посадка',hold:'Зона ожидания',conflict:'КОНФЛИКТ ТРАЕКТОРИЙ',ground:'На стоянке',depart:'Взлёт / набор высоты'}[p.state]}
+function cmd(a){if(!chosen)return;let p=chosen;
+if(a==='approach'){p.state='approach';p.tx=500;p.ty=535;p.speed*=1.12;msg(`${p.call}: разрешён заход на ВПП 27. Ветер ${wind} уз.`)}
+if(a==='hold'){p.state='hold';p.tx=500+Math.cos(Math.random()*6)*180;p.ty=320+Math.sin(Math.random()*6)*150;msg(`${p.call}: следуйте в зону ожидания, сохраняйте эшелон.`)}
+if(a==='takeoff'){if(p.state!=='ground'){msg('Взлёт разрешён только борту, находящемуся на стоянке.');return}p.state='depart';p.tx=500;p.ty=-80;msg(`${p.call}: ВПП 27 свободна. Взлёт разрешён!`)}
+if(a==='goaround'){p.state='hold';p.tx=500+Math.cos(Math.random()*6)*190;p.ty=320+Math.sin(Math.random()*6)*160;msg(`${p.call}: уход на второй круг. Набирайте высоту.`)}
+render()}
+$('approach').onclick=()=>cmd('approach');$('hold').onclick=()=>cmd('hold');$('takeoff').onclick=()=>cmd('takeoff');$('goaround').onclick=()=>cmd('goaround');
+$('weatherBtn').onclick=()=>{weather=weather==='Ясно'?'Дождь':weather==='Дождь'?'Туман':'Ясно';wind=weather==='Ясно'?4:weather==='Дождь'?13:7;$('weather').textContent=weather;msg(`Погодные условия изменились: ${weather.toLowerCase()}, ветер ${wind} уз.`)};
+$('reset').onclick=()=>{aircraft=[];chosen=null;score=0;served=0;minute=0;logs=[];$('score').textContent=0;$('served').textContent=0;$('clock').textContent='08:00';log('Начата новая смена.');add();add();select(null);render()};
+function render(){ $('count').textContent=aircraft.length+' бортов';$('flights').innerHTML='';aircraft.forEach(p=>{let el=document.createElement('div');el.className='flight'+(p===chosen?' active':'');let cls=p.state==='conflict'?'red':p.state==='ground'?'green':p.state==='hold'?'gold':'';el.innerHTML=`<div><strong>${p.call}</strong><small>${status(p)}</small></div><span class="pill ${cls}">${p.state.toUpperCase()}</span>`;el.onclick=()=>select(p);$('flights').appendChild(el)});$('traffic').textContent='Трафик: '+(aircraft.length>6?'высокий':aircraft.length>3?'средний':'низкий')}
 function draw(){
- ctx.clearRect(0,0,900,620);ctx.fillStyle='#071b25';ctx.fillRect(0,0,900,620);
- ctx.strokeStyle='#17404a';ctx.lineWidth=1;
- for(let r=70;r<=280;r+=70){ctx.beginPath();ctx.arc(450,310,r,0,Math.PI*2);ctx.stroke()}
- for(let x=0;x<=900;x+=75){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,620);ctx.stroke()}
- for(let y=0;y<=620;y+=75){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(900,y);ctx.stroke()}
- ctx.strokeStyle='#4b8790';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(450,480);ctx.lineTo(450,570);ctx.stroke();ctx.fillStyle='#8ba4bb';ctx.font='12px Arial';ctx.fillText('ВПП 1',465,535);ctx.fillText('SECTOR A',22,28);
- ctx.strokeStyle='#58e39b';ctx.lineWidth=2;ctx.strokeRect(365,455,170,110);
- planes.forEach(p=>{
-  if(p.state==='parked')return;let col=colors[p.state]||colors.air;
-  ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.dir);ctx.fillStyle=col;ctx.beginPath();ctx.moveTo(12,0);ctx.lineTo(-8,-6);ctx.lineTo(-4,0);ctx.lineTo(-8,6);ctx.closePath();ctx.fill();ctx.restore();
-  ctx.fillStyle=col;ctx.font='12px monospace';ctx.fillText(p.name,p.x+12,p.y-10);
-  if(p===selected){ctx.strokeStyle='#fff';ctx.beginPath();ctx.arc(p.x,p.y,19,0,Math.PI*2);ctx.stroke()}
- });
- // sweep
- const a=(Date.now()/1800)%(Math.PI*2);ctx.strokeStyle='#53d9e855';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(450,310);ctx.lineTo(450+Math.cos(a)*290,310+Math.sin(a)*290);ctx.stroke();
- requestAnimationFrame(draw);
-}
-canvas.addEventListener('click',e=>{const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*900/r.width,y=(e.clientY-r.top)*620/r.height;let p=planes.find(q=>Math.hypot(q.x-x,q.y-y)<24);if(p)select(p)});
-function tick(){
- if(gameOver)return;minutes++;$('clock').textContent=String(8+Math.floor(minutes/60)).padStart(2,'0')+':'+String(minutes%60).padStart(2,'0');
- spawn++;if(spawn%8===0&&planes.filter(p=>p.state!=='parked').length<8)addPlane();
- planes.forEach(p=>{
-  p.age++;
-  if(p.state==='hold'){p.dir+=.025;p.x+=Math.cos(p.dir)*p.spd;p.y+=Math.sin(p.dir)*p.spd}
-  else {let dx=p.tx-p.x,dy=p.ty-p.y,d=Math.hypot(dx,dy);if(d>3){p.dir=Math.atan2(dy,dx);p.x+=dx/d*p.spd;p.y+=dy/d*p.spd}else if(p.state==='landing'){p.state='parked';p.x=450;p.y=520;score+=100;done++;say(`${p.name} успешно приземлился. +100 очков`);if(p===selected)select(p);$('score').textContent=score;$('done').textContent=done;}}
-  if(p.state==='depart'&&(p.y<-40||p.x<-40||p.x>940)){planes=planes.filter(q=>q!==p);score+=50;done++;$('score').textContent=score;$('done').textContent=done}
- });
- // proximity warnings
- for(let i=0;i<planes.length;i++)for(let j=i+1;j<planes.length;j++){let a=planes[i],b=planes[j];if(a.state!=='parked'&&b.state!=='parked'&&Math.hypot(a.x-b.x,a.y-b.y)<34){a.state='danger';b.state='danger';say('⚠ ВНИМАНИЕ: опасное сближение! Разведите самолёты.');}}
- $('traffic').textContent=planes.length>5?'Высокий':planes.length>2?'Средний':'Низкий';
- if(selected&&planes.includes(selected)){$('details').innerHTML=`<b>${selected.name}</b><br>Статус: ${status(selected)}<br>Координаты: ${Math.round(selected.x)}, ${Math.round(selected.y)}<br>Время в зоне: ${selected.age} сек.`}
- renderFlights();
-}
-addPlane();addPlane();draw();setInterval(tick,1000);
-</script>
-</body></html>
+g.fillStyle='#071923';g.fillRect(0,0,1000,690);
+// subtle radar grid
+g.strokeStyle='#153744';g.lineWidth=1;for(let x=0;x<1000;x+=50){g.beginPath();g.moveTo(x,0);g.lineTo(x,690);g.stroke()}for(let y=0;y<690;y+=50){g.beginPath();g.moveTo(0,y);g.lineTo(1000,y);g.stroke()}
+g.strokeStyle='#28606a';g.lineWidth=2;for(let r=90;r<340;r+=83){g.beginPath();g.arc(500,340,r,0,Math.PI*2);g.stroke()}
+g.strokeStyle='#6e9da0';g.lineWidth=2;g.setLineDash([10,7]);g.beginPath();g.moveTo(500,20);g.lineTo(500,660);g.stroke();g.setLineDash([]);
+ // runway, taxiways, terminal
+g.save();g.translate(500,555);g.rotate(-.035);g.fillStyle='#293c4b';g.fillRect(-235,-24,470,48);g.fillStyle='#d8e3e6';for(let x=-210;x<210;x+=35)g.fillRect(x,-2,18,4);g.restore();
+g.fillStyle='#172d3b';g.fillRect(380,585,240,45);g.strokeStyle='#54798a';g.strokeRect(380,585,240,45);g.fillStyle='#9ab5c4';g.font='12px Arial';g.fillText('TERMINAL  ·  GATES A1—A8',400,612);g.fillText('RWY 27 / 09',750,550);
+g.fillStyle='#9ab5c4';g.font='11px monospace';g.fillText('N',493,18);g.fillText('W',12,345);g.fillText('E',978,345);g.fillText('S',493,680);
+aircraft.forEach(p=>{if(p.state==='ground'){g.fillStyle=colors.ground;g.fillRect(410+(aircraft.indexOf(p)%5)*35,595,19,8);return}
+let col=colors[p.state]||colors.air;g.save();g.translate(p.x,p.y);g.rotate(p.heading);g.fillStyle=col;g.beginPath();g.moveTo(15,0);g.lineTo(-10,-7);g.lineTo(-5,0);g.lineTo(-10,7);g.closePath();g.fill();g.restore();
+g.font='12px monospace';g.fillStyle=col;g.fillText(p.call,p.x+13,p.y-10);g.font='9px monospace';g.fillText('FL'+Math.round(p.alt/100),p.x+13,p.y+2);
+if(p===chosen){g.strokeStyle='#fff';g.lineWidth=1.5;g.beginPath();g.arc(p.x,p.y,23,0,Math.PI*2);g.stroke()}
+if(p.state==='conflict'){g.strokeStyle=colors.conflict;g.beginPath();g.arc(p.x,p.y,30,0,Math.PI*2);g.stroke()}
+});
+// weather haze
+if(weather==='Туман'){g.fillStyle='#c5d5df18';g.fillRect(0,0,1000,690)}else if(weather==='Дождь'){g.strokeStyle='#8ac7e055';for(let i=0;i<50;i++){let x=(i*97+Date.now()/12)%1000,y=(i*61+Date.now()/5)%690;g.beginPath();g.moveTo(x,y);g.lineTo(x-5,y+13);g.stroke()}}
+requestAnimationFrame(draw)}
+function tick(){minute++;$('clock').textContent=String(8+Math.floor(minute/60)).padStart(2,'0')+':'+String(minute%60).padStart(2,'0');spawn++;if(spawn%Math.max(4,Math.round(8/Number($('difficulty').value)) )===0&&aircraft.filter(p=>!['ground','depart'].includes(p.state)).length<9)add();
+aircraft.forEach(p=>{p.age++;p.fuel-=p.state==='hold'?.15:.06;if(p.state==='hold'){p.heading+=.025;p.x+=Math.cos(p.heading)*p.speed;p.y+=Math.sin(p.heading)*p.speed}else if(p.state!=='ground'){let dx=p.tx-p.x,dy=p.ty-p.y,d=Math.hypot(dx,dy);if(d>3){p.heading=Math.atan2(dy,dx);p.x+=dx/d*p.speed;p.y+=dy/d*p.speed}else if(p.state==='approach'){p.state='ground';p.x=500;p.y=595;score+=120;served++;$('score').textContent=score;$('served').textContent=served;msg(`${p.call}: посадка завершена. +120 рейтинга.`);if(chosen===p)select(p)}else if(p.state==='depart'){aircraft=aircraft.filter(a=>a!==p);score+=60;served++;$('score').textContent=score;$('served').textContent=served;msg(`${p.call}: вылет выполнен. +60 рейтинга.`)}}});
+for(let i=0;i<aircraft.length;i++)for(let j=i+1;j<aircraft.length;j++){let a=aircraft[i],b=aircraft[j];if(!['ground','depart'].includes(a.state)&&!['ground','depart'].includes(b.state)&&Math.hypot(a.x-b.x,a.y-b.y)<38){a.state='conflict';b.state='conflict';}}
+if(chosen&&aircraft.includes(chosen))$('detail').innerHTML=`<b>${chosen.call}</b><br>Статус: ${status(chosen)}<br>Эшелон: FL${Math.round(chosen.alt/100)} · Топливо: ${Math.max(0,Math.round(chosen.fuel))}%<br>Маршрут: ${chosen.route} · Время в секторе: ${chosen.age} сек.`;
+render()}
+$('difficulty').addEventListener('change',()=>msg('Уровень сложности изменён. Новые рейсы будут поступать с обновлённой частотой.'));
+c.addEventListener('click',e=>{let r=c.getBoundingClientRect(),x=(e.clientX-r.left)*1000/r.width,y=(e.clientY-r.top)*690/r.height,p=aircraft.find(q=>q.state!=='ground'&&Math.hypot(q.x-x,q.y-y)<28);if(p)select(p)});
+add();add();add();log('Смена началась. На радаре три борта.');render();draw();setInterval(tick,1000);
+</script></body></html>
