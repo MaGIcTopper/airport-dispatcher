@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATC — Диспетчер аэропорта</title>
+<style>
+:root{--bg:#07111f;--panel:#101f31;--line:#25415a;--cyan:#53d9e8;--green:#58e39b;--red:#ff647c;--yellow:#ffd166;--muted:#8ba4bb}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% -20%,#183651,#07111f 55%);color:#eaf5ff;font-family:Inter,system-ui,Arial,sans-serif;min-height:100vh}
+header{display:flex;justify-content:space-between;align-items:center;padding:18px 24px;border-bottom:1px solid var(--line);background:#081522cc;gap:16px;flex-wrap:wrap}
+.brand{font-weight:900;letter-spacing:2px}.brand span{color:var(--cyan)}.sub{color:var(--muted);font-size:12px;margin-top:4px}
+.stats{display:flex;gap:10px;flex-wrap:wrap}.stat{background:#102238;border:1px solid var(--line);padding:9px 14px;border-radius:12px;min-width:90px}.stat small{display:block;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:1px}.stat b{font-size:19px}
+main{max-width:1400px;margin:auto;padding:20px;display:grid;grid-template-columns:minmax(0,1.7fr) minmax(280px,.8fr);gap:18px}
+.panel{background:linear-gradient(145deg,#11243a,#0b1929);border:1px solid var(--line);border-radius:17px;overflow:hidden;box-shadow:0 16px 40px #0003}.panel-head{padding:14px 17px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.panel-head h2{font-size:13px;letter-spacing:1.5px;margin:0}.live{color:var(--green);font-size:11px}
+#radar{display:block;width:100%;height:auto;aspect-ratio:1.45;background:#071b25}
+.legend{display:flex;gap:15px;padding:12px 16px;color:var(--muted);font-size:11px;flex-wrap:wrap}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px}
+.side{display:flex;flex-direction:column;gap:18px}.flight-list{padding:8px;display:flex;flex-direction:column;gap:7px;max-height:300px;overflow:auto}.flight{display:grid;grid-template-columns:1fr auto;gap:6px;background:#0b1b2b;border:1px solid #1d354b;border-radius:11px;padding:10px;cursor:pointer}.flight.selected{border-color:var(--cyan);background:#123047}.flight strong{font-size:13px}.flight small{display:block;color:var(--muted);font-size:11px;margin-top:3px}.tag{font-size:10px;padding:4px 7px;border-radius:20px;background:#183b4a;color:var(--cyan);height:max-content}
+.controls{padding:15px;display:grid;grid-template-columns:1fr 1fr;gap:9px}.controls button,.primary{border:1px solid #31516a;border-radius:10px;padding:11px 9px;background:#142b40;color:#eaf5ff;font-weight:700;cursor:pointer;transition:.15s}.controls button:hover,.primary:hover{transform:translateY(-1px);border-color:var(--cyan);background:#1b3d55}.controls button:disabled{opacity:.35;cursor:not-allowed;transform:none}.controls .go{background:#0f493d;border-color:#23775f;color:#9bffd1}.controls .warn{background:#472333;border-color:#8e3b53;color:#ff9cac}
+.info{padding:14px 16px;color:var(--muted);font-size:12px;line-height:1.6}.info b{color:#eaf5ff}.message{margin:0 14px 14px;padding:11px;border-radius:10px;background:#0a1b2a;color:var(--cyan);font-size:12px;min-height:40px}
+footer{text-align:center;color:#58728a;font-size:11px;padding:4px 20px 25px}
+@media(max-width:850px){main{grid-template-columns:1fr;padding:12px}.side{display:grid;grid-template-columns:1fr 1fr}.side .panel:first-child{grid-column:1/-1}}
+@media(max-width:520px){.side{display:flex}.stats{width:100%}.stat{flex:1}.panel-head{padding:12px}.controls{padding:10px}}
+</style>
+</head>
+<body>
+<header>
+ <div><div class="brand">✈ ATC <span>CONTROL</span></div><div class="sub">МЕЖДУНАРОДНЫЙ АЭРОПОРТ · СИМУЛЯТОР ДИСПЕТЧЕРА</div></div>
+ <div class="stats">
+  <div class="stat"><small>Очки</small><b id="score">0</b></div>
+  <div class="stat"><small>Рейс выполнен</small><b id="done">0</b></div>
+  <div class="stat"><small>Трафик</small><b id="traffic">Низкий</b></div>
+  <div class="stat"><small>Время</small><b id="clock">08:00</b></div>
+ </div>
+</header>
+<main>
+ <section class="panel">
+  <div class="panel-head"><h2>РАДАР ВОЗДУШНОГО ДВИЖЕНИЯ</h2><span class="live">● LIVE SIMULATION</span></div>
+  <canvas id="radar" width="900" height="620"></canvas>
+  <div class="legend"><span><i class="dot" style="background:#53d9e8"></i>В воздухе</span><span><i class="dot" style="background:#58e39b"></i>Посадка</span><span><i class="dot" style="background:#ffd166"></i>Ожидание</span><span><i class="dot" style="background:#ff647c"></i>Опасность</span></div>
+ </section>
+ <div class="side">
+  <section class="panel"><div class="panel-head"><h2>ТАБЛО РЕЙСОВ</h2><span class="live" id="flightCount">0 рейсов</span></div><div class="flight-list" id="flights"></div></section>
+  <section class="panel"><div class="panel-head"><h2>УПРАВЛЕНИЕ РЕЙСОМ</h2><span class="live" id="selectedLabel">НЕ ВЫБРАН</span></div>
+   <div class="info" id="details">Выбери самолёт на радаре или в табло, чтобы отдавать команды.</div>
+   <div class="controls">
+    <button id="land" class="go" disabled>🛬 Посадка</button><button id="hold" disabled>⏸ Круг</button>
+    <button id="takeoff" class="go" disabled>🛫 Взлёт</button><button id="cancel" class="warn" disabled>✕ Сбросить</button>
+   </div><p class="message" id="message">Диспетчерская готова. Удачной смены!</p>
+  </section>
+ </div>
+</main>
+<footer>ATC CONTROL · Учебная аркадная симуляция. Все рейсы вымышлены.</footer>
+<script>
+const canvas=document.getElementById('radar'),ctx=canvas.getContext('2d');
+const $=id=>document.getElementById(id);
+let planes=[],selected=null,score=0,done=0,minutes=0,spawn=0,gameOver=false;
+const names=['AER 214','SKY 508','JET 031','NORD 772','WST 119','EAG 640','FLY 225','AIR 903'];
+const colors={air:'#53d9e8',landing:'#58e39b',hold:'#ffd166',danger:'#ff647c'};
+function say(t){$('message').textContent=t}
+function addPlane(){
+ const side=Math.floor(Math.random()*4),p={id:Math.random().toString(36).slice(2,8),name:names[Math.floor(Math.random()*names.length)],x:side===0?30:side===1?870:Math.random()*840+30,y:side===2?30:side===3?590:Math.random()*560+30,tx:450,ty:315,state:'air',age:0,dir:Math.random()*6.28,spd:0.55+Math.random()*.35};
+ p.tx=side===0?450:side===1?450:side===2?450:450;p.ty=side===2?315:side===3?315:315;
+ planes.push(p);renderFlights();
+}
+function select(p){selected=p;$('selectedLabel').textContent=p?p.name:'НЕ ВЫБРАН';$('land').disabled=!p;$('hold').disabled=!p;$('takeoff').disabled=!p;$('cancel').disabled=!p;
+ $('details').innerHTML=p?`<b>${p.name}</b><br>Статус: ${status(p)}<br>Координаты: ${Math.round(p.x)}, ${Math.round(p.y)}<br>Время в зоне: ${Math.floor(p.age)} сек.`:'Выбери самолёт на радаре или в табло, чтобы отдавать команды.';renderFlights();}
+function status(p){return {air:'В воздушной зоне',landing:'Заходит на посадку',hold:'Выполняет круг',danger:'Опасное сближение',depart:'Взлетает'}[p.state]||p.state}
+function command(cmd){if(!selected)return;const p=selected;
+ if(cmd==='land'){p.state='landing';p.tx=450;p.ty=500;say(`${p.name}: разрешена посадка на ВПП 1.`)}
+ if(cmd==='hold'){p.state='hold';p.tx=450+Math.cos(p.dir)*180;p.ty=300+Math.sin(p.dir)*150;say(`${p.name}: следуйте в зону ожидания.`)}
+ if(cmd==='takeoff'){if(p.state!=='parked'){say('Взлёт разрешён только самолёту на земле.');return}p.state='depart';p.tx=450;p.ty=-50;say(`${p.name}: взлёт разрешён!`)}
+ if(cmd==='cancel'){planes=planes.filter(x=>x!==p);select(null);say('Рейс удалён из симуляции.');}
+ renderFlights();}
+$('land').onclick=()=>command('land');$('hold').onclick=()=>command('hold');$('takeoff').onclick=()=>command('takeoff');$('cancel').onclick=()=>command('cancel');
+function renderFlights(){
+ $('flightCount').textContent=planes.length+' рейсов';$('flights').innerHTML='';
+ planes.forEach(p=>{const d=document.createElement('div');d.className='flight'+(p===selected?' selected':'');d.innerHTML=`<div><strong>${p.name}</strong><small>${status(p)}</small></div><span class="tag">${p.state==='landing'?'APP':p.state==='parked'?'GROUND':p.state==='depart'?'DEP':'RADAR'}</span>`;d.onclick=()=>select(p);$('flights').appendChild(d)});
+}
+function draw(){
+ ctx.clearRect(0,0,900,620);ctx.fillStyle='#071b25';ctx.fillRect(0,0,900,620);
+ ctx.strokeStyle='#17404a';ctx.lineWidth=1;
+ for(let r=70;r<=280;r+=70){ctx.beginPath();ctx.arc(450,310,r,0,Math.PI*2);ctx.stroke()}
+ for(let x=0;x<=900;x+=75){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,620);ctx.stroke()}
+ for(let y=0;y<=620;y+=75){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(900,y);ctx.stroke()}
+ ctx.strokeStyle='#4b8790';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(450,480);ctx.lineTo(450,570);ctx.stroke();ctx.fillStyle='#8ba4bb';ctx.font='12px Arial';ctx.fillText('ВПП 1',465,535);ctx.fillText('SECTOR A',22,28);
+ ctx.strokeStyle='#58e39b';ctx.lineWidth=2;ctx.strokeRect(365,455,170,110);
+ planes.forEach(p=>{
+  if(p.state==='parked')return;let col=colors[p.state]||colors.air;
+  ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.dir);ctx.fillStyle=col;ctx.beginPath();ctx.moveTo(12,0);ctx.lineTo(-8,-6);ctx.lineTo(-4,0);ctx.lineTo(-8,6);ctx.closePath();ctx.fill();ctx.restore();
+  ctx.fillStyle=col;ctx.font='12px monospace';ctx.fillText(p.name,p.x+12,p.y-10);
+  if(p===selected){ctx.strokeStyle='#fff';ctx.beginPath();ctx.arc(p.x,p.y,19,0,Math.PI*2);ctx.stroke()}
+ });
+ // sweep
+ const a=(Date.now()/1800)%(Math.PI*2);ctx.strokeStyle='#53d9e855';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(450,310);ctx.lineTo(450+Math.cos(a)*290,310+Math.sin(a)*290);ctx.stroke();
+ requestAnimationFrame(draw);
+}
+canvas.addEventListener('click',e=>{const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*900/r.width,y=(e.clientY-r.top)*620/r.height;let p=planes.find(q=>Math.hypot(q.x-x,q.y-y)<24);if(p)select(p)});
+function tick(){
+ if(gameOver)return;minutes++;$('clock').textContent=String(8+Math.floor(minutes/60)).padStart(2,'0')+':'+String(minutes%60).padStart(2,'0');
+ spawn++;if(spawn%8===0&&planes.filter(p=>p.state!=='parked').length<8)addPlane();
+ planes.forEach(p=>{
+  p.age++;
+  if(p.state==='hold'){p.dir+=.025;p.x+=Math.cos(p.dir)*p.spd;p.y+=Math.sin(p.dir)*p.spd}
+  else {let dx=p.tx-p.x,dy=p.ty-p.y,d=Math.hypot(dx,dy);if(d>3){p.dir=Math.atan2(dy,dx);p.x+=dx/d*p.spd;p.y+=dy/d*p.spd}else if(p.state==='landing'){p.state='parked';p.x=450;p.y=520;score+=100;done++;say(`${p.name} успешно приземлился. +100 очков`);if(p===selected)select(p);$('score').textContent=score;$('done').textContent=done;}}
+  if(p.state==='depart'&&(p.y<-40||p.x<-40||p.x>940)){planes=planes.filter(q=>q!==p);score+=50;done++;$('score').textContent=score;$('done').textContent=done}
+ });
+ // proximity warnings
+ for(let i=0;i<planes.length;i++)for(let j=i+1;j<planes.length;j++){let a=planes[i],b=planes[j];if(a.state!=='parked'&&b.state!=='parked'&&Math.hypot(a.x-b.x,a.y-b.y)<34){a.state='danger';b.state='danger';say('⚠ ВНИМАНИЕ: опасное сближение! Разведите самолёты.');}}
+ $('traffic').textContent=planes.length>5?'Высокий':planes.length>2?'Средний':'Низкий';
+ if(selected&&planes.includes(selected)){$('details').innerHTML=`<b>${selected.name}</b><br>Статус: ${status(selected)}<br>Координаты: ${Math.round(selected.x)}, ${Math.round(selected.y)}<br>Время в зоне: ${selected.age} сек.`}
+ renderFlights();
+}
+addPlane();addPlane();draw();setInterval(tick,1000);
+</script>
+</body></html>
