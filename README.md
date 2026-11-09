@@ -6,4 +6,4 @@
 
 ## 🎮 Демо
 
-После публикации на GitHub Pages игра будет доступна по адресу:
+После публикации на GitHub Pages игра будет доступна по адресу: https://magictopper.github.io/sk-investigator-game/
