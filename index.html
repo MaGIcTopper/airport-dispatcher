@@ -1,571 +1,1316 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Следователь СК — Интерактивный квест</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Следователь СК — Интерактивный квест</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
 
-        body {
-            font-family: 'Georgia', 'Times New Roman', serif;
-            background: #1a1e24;
-            color: #e0e0e0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-            line-height: 1.5;
-        }
+    :root {
+        --bg-dark: #0a0f1a;
+        --bg-mid: #141b28;
+        --card-bg: rgba(20, 27, 40, 0.75);
+        --card-border: rgba(212, 175, 55, 0.15);
+        --gold: #d4af37;
+        --gold-light: #f0d97d;
+        --gold-dark: #8a6f2e;
+        --green: #4ade80;
+        --green-dark: #166534;
+        --red: #f87171;
+        --red-dark: #7f1d1d;
+        --text: #e8eaed;
+        --text-muted: #9aa0a6;
+        --text-dim: #5a6470;
+    }
 
-        .game-container {
-            max-width: 800px;
-            width: 100%;
-            background: #22272e;
-            border-radius: 16px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7), 0 0 0 2px #3a404a;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            min-height: 600px;
-        }
+    html, body {
+        height: 100%;
+    }
 
+    body {
+        font-family: 'Inter', system-ui, sans-serif;
+        background: var(--bg-dark);
+        color: var(--text);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+        line-height: 1.6;
+        overflow-x: hidden;
+        position: relative;
+    }
+
+    /* Анимированный фон */
+    .bg-orbs {
+        position: fixed;
+        inset: 0;
+        overflow: hidden;
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    .orb {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(80px);
+        opacity: 0.35;
+        animation: float 20s infinite ease-in-out;
+    }
+
+    .orb-1 {
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(circle, #1e4a5f, transparent 70%);
+        top: -10%;
+        left: -10%;
+        animation-delay: 0s;
+    }
+
+    .orb-2 {
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(circle, #4a3b0f, transparent 70%);
+        bottom: -15%;
+        right: -10%;
+        animation-delay: -7s;
+    }
+
+    .orb-3 {
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, #1e3a2a, transparent 70%);
+        top: 40%;
+        right: 20%;
+        animation-delay: -14s;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translate(0, 0) scale(1); }
+        33% { transform: translate(40px, -30px) scale(1.1); }
+        66% { transform: translate(-30px, 40px) scale(0.9); }
+    }
+
+    /* Основной контейнер */
+    .game-container {
+        max-width: 900px;
+        width: 100%;
+        background: var(--card-bg);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-radius: 24px;
+        border: 1px solid var(--card-border);
+        box-shadow:
+            0 30px 60px rgba(0, 0, 0, 0.6),
+            0 0 0 1px rgba(255, 255, 255, 0.03),
+            inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        min-height: 620px;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Header */
+    .header {
+        background: linear-gradient(135deg, rgba(11, 43, 59, 0.9), rgba(30, 74, 95, 0.6));
+        padding: 20px 28px;
+        border-bottom: 1px solid var(--card-border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        position: relative;
+    }
+
+    .header::after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        opacity: 0.5;
+    }
+
+    .header h1 {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--gold-light);
+        letter-spacing: 0.5px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .header h1 .icon {
+        font-size: 1.6rem;
+        filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.5));
+    }
+
+    .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .score-box {
+        background: rgba(11, 43, 59, 0.8);
+        padding: 8px 20px;
+        border-radius: 999px;
+        border: 1px solid var(--card-border);
+        font-weight: 600;
+        color: var(--text);
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .score-box span {
+        color: var(--gold-light);
+        font-size: 1.15rem;
+        font-weight: 700;
+        min-width: 20px;
+        display: inline-block;
+        text-align: center;
+    }
+
+    .score-box.pulse {
+        animation: scorePulse 0.5s ease;
+    }
+
+    @keyframes scorePulse {
+        0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4); }
+        50% { transform: scale(1.1); box-shadow: 0 0 0 12px rgba(212, 175, 55, 0); }
+        100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
+    }
+
+    .streak-badge {
+        display: none;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 14px;
+        background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(212, 175, 55, 0.1));
+        border: 1px solid rgba(212, 175, 55, 0.4);
+        border-radius: 999px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: var(--gold-light);
+        animation: streakPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .streak-badge.visible {
+        display: flex;
+    }
+
+    @keyframes streakPop {
+        0% { transform: scale(0.5); opacity: 0; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+
+    .restart-icon-btn {
+        background: transparent;
+        border: 1px solid var(--card-border);
+        color: var(--text-muted);
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        font-size: 1rem;
+    }
+
+    .restart-icon-btn:hover {
+        border-color: var(--gold);
+        color: var(--gold-light);
+        transform: rotate(-180deg);
+    }
+
+    /* Content */
+    .content {
+        padding: 32px 30px;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+    }
+
+    .screen {
+        display: none;
+        flex-direction: column;
+        flex-grow: 1;
+        animation: fadeInUp 0.4s ease;
+    }
+
+    .screen.active {
+        display: flex;
+    }
+
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(15px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Стартовый экран */
+    .start-screen {
+        text-align: center;
+        justify-content: center;
+        align-items: center;
+        padding: 20px 0;
+    }
+
+    .start-emblem {
+        font-size: 4rem;
+        margin-bottom: 8px;
+        filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.4));
+        animation: emblemFloat 3s ease-in-out infinite;
+    }
+
+    @keyframes emblemFloat {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-8px); }
+    }
+
+    .start-screen h2 {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.4rem;
+        color: var(--gold-light);
+        margin-bottom: 16px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+
+    .start-screen p {
+        font-size: 1.05rem;
+        margin-bottom: 14px;
+        color: var(--text-muted);
+        max-width: 600px;
+        line-height: 1.7;
+    }
+
+    .start-stats {
+        display: flex;
+        gap: 24px;
+        margin: 24px 0 32px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .start-stat {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 14px 24px;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--card-border);
+        border-radius: 14px;
+        min-width: 120px;
+    }
+
+    .start-stat-label {
+        font-size: 0.75rem;
+        color: var(--text-dim);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 4px;
+    }
+
+    .start-stat-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--gold-light);
+        font-family: 'Playfair Display', serif;
+    }
+
+    /* Кнопки */
+    .btn {
+        background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+        color: #1a1e24;
+        border: none;
+        padding: 15px 42px;
+        font-size: 1.05rem;
+        font-weight: 700;
+        border-radius: 999px;
+        cursor: pointer;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        font-family: inherit;
+        letter-spacing: 1px;
+        box-shadow: 0 6px 20px rgba(212, 175, 55, 0.25), 0 2px 0 var(--gold-dark);
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, rgba(255,255,255,0.3), transparent);
+        transform: translateX(-100%);
+        transition: transform 0.5s ease;
+    }
+
+    .btn:hover::before {
+        transform: translateX(100%);
+    }
+
+    .btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 28px rgba(212, 175, 55, 0.35), 0 3px 0 var(--gold-dark);
+    }
+
+    .btn:active {
+        transform: translateY(1px);
+        box-shadow: 0 3px 10px rgba(212, 175, 55, 0.2), 0 1px 0 var(--gold-dark);
+    }
+
+    .btn:disabled {
+        background: linear-gradient(135deg, #3a404a, #4a505a);
+        box-shadow: 0 2px 0 #1e2228;
+        cursor: not-allowed;
+        transform: none;
+        opacity: 0.6;
+        color: var(--text-dim);
+    }
+
+    .btn .arrow {
+        transition: transform 0.25s ease;
+    }
+
+    .btn:not(:disabled):hover .arrow {
+        transform: translateX(4px);
+    }
+
+    .btn-secondary {
+        background: transparent;
+        color: var(--text-muted);
+        border: 1px solid var(--card-border);
+        box-shadow: none;
+        padding: 12px 28px;
+        font-size: 0.95rem;
+    }
+
+    .btn-secondary:hover {
+        border-color: var(--gold);
+        color: var(--gold-light);
+        box-shadow: 0 0 20px rgba(212, 175, 55, 0.15);
+    }
+
+    /* Экран вопроса */
+    .question-screen {
+        justify-content: flex-start;
+    }
+
+    .q-topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+        gap: 12px;
+    }
+
+    .category-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 14px;
+        background: rgba(212, 175, 55, 0.1);
+        border: 1px solid rgba(212, 175, 55, 0.3);
+        border-radius: 999px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: var(--gold-light);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .question-counter {
+        font-size: 0.85rem;
+        color: var(--text-dim);
+        font-weight: 600;
+    }
+
+    .question-counter .current {
+        color: var(--gold-light);
+        font-size: 1.05rem;
+    }
+
+    .scenario-box {
+        background: linear-gradient(135deg, rgba(45, 51, 59, 0.8), rgba(30, 38, 50, 0.6));
+        border-left: 4px solid var(--gold);
+        padding: 20px 24px;
+        margin-bottom: 22px;
+        border-radius: 0 14px 14px 0;
+        font-style: italic;
+        color: #c8d0d8;
+        font-size: 1rem;
+        line-height: 1.65;
+        position: relative;
+        animation: slideInLeft 0.5s ease;
+    }
+
+    .scenario-box::before {
+        content: '"';
+        position: absolute;
+        top: -10px;
+        left: 12px;
+        font-family: 'Playfair Display', serif;
+        font-size: 4rem;
+        color: var(--gold);
+        opacity: 0.15;
+        line-height: 1;
+    }
+
+    @keyframes slideInLeft {
+        from { opacity: 0; transform: translateX(-20px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+
+    .question-text {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.35rem;
+        font-weight: 600;
+        color: var(--gold-light);
+        margin-bottom: 22px;
+        line-height: 1.4;
+        animation: fadeInUp 0.4s ease 0.1s both;
+    }
+
+    .options {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .option {
+        background: rgba(45, 51, 59, 0.7);
+        border: 1.5px solid rgba(58, 64, 74, 0.8);
+        border-radius: 14px;
+        padding: 16px 20px;
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        font-size: 1rem;
+        color: var(--text);
+        text-align: left;
+        font-family: inherit;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        width: 100%;
+        position: relative;
+        animation: fadeInUp 0.4s ease both;
+    }
+
+    .option:nth-child(1) { animation-delay: 0.15s; }
+    .option:nth-child(2) { animation-delay: 0.22s; }
+    .option:nth-child(3) { animation-delay: 0.29s; }
+
+    .option:hover:not(.disabled) {
+        border-color: var(--gold);
+        background: rgba(56, 63, 76, 0.9);
+        transform: translateX(6px);
+        box-shadow: 0 4px 20px rgba(212, 175, 55, 0.15);
+    }
+
+    .option.selected-correct {
+        border-color: var(--green);
+        background: linear-gradient(135deg, rgba(30, 58, 42, 0.9), rgba(22, 101, 52, 0.3));
+        box-shadow: 0 0 25px rgba(74, 222, 128, 0.25);
+        animation: correctPulse 0.5s ease;
+    }
+
+    @keyframes correctPulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.02); }
+        100% { transform: scale(1); }
+    }
+
+    .option.selected-wrong {
+        border-color: var(--red);
+        background: linear-gradient(135deg, rgba(58, 30, 30, 0.9), rgba(127, 29, 29, 0.3));
+        box-shadow: 0 0 25px rgba(248, 113, 113, 0.25);
+        animation: wrongShake 0.5s ease;
+    }
+
+    @keyframes wrongShake {
+        0%, 100% { transform: translateX(0); }
+        20% { transform: translateX(-8px); }
+        40% { transform: translateX(8px); }
+        60% { transform: translateX(-5px); }
+        80% { transform: translateX(5px); }
+    }
+
+    .option.disabled {
+        cursor: default;
+    }
+
+    .option.disabled:not(.selected-correct):not(.selected-wrong) {
+        opacity: 0.5;
+    }
+
+    .option .letter {
+        font-family: 'Playfair Display', serif;
+        font-weight: 700;
+        color: var(--gold);
+        min-width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: rgba(212, 175, 55, 0.12);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+    }
+
+    .option:hover:not(.disabled) .letter {
+        background: rgba(212, 175, 55, 0.25);
+        transform: scale(1.1);
+    }
+
+    .option.selected-correct .letter {
+        background: var(--green);
+        color: var(--bg-dark);
+    }
+
+    .option.selected-wrong .letter {
+        background: var(--red);
+        color: var(--bg-dark);
+    }
+
+    .option .check-icon {
+        margin-left: auto;
+        font-size: 1.2rem;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    }
+
+    .option.selected-correct .check-icon,
+    .option.selected-wrong .check-icon {
+        opacity: 1;
+    }
+
+    .feedback {
+        margin-top: 6px;
+        padding: 16px 20px;
+        border-radius: 14px;
+        font-size: 0.95rem;
+        display: none;
+        animation: feedbackSlide 0.4s ease;
+        line-height: 1.6;
+    }
+
+    @keyframes feedbackSlide {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .feedback.correct {
+        display: block;
+        background: linear-gradient(135deg, rgba(30, 58, 42, 0.7), rgba(22, 101, 52, 0.2));
+        border: 1px solid rgba(74, 222, 128, 0.4);
+        color: #bbf7d0;
+    }
+
+    .feedback.wrong {
+        display: block;
+        background: linear-gradient(135deg, rgba(58, 30, 30, 0.7), rgba(127, 29, 29, 0.2));
+        border: 1px solid rgba(248, 113, 113, 0.4);
+        color: #fecaca;
+    }
+
+    .feedback .law-ref {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 10px;
+        padding: 4px 12px;
+        font-size: 0.8rem;
+        color: var(--gold-light);
+        background: rgba(212, 175, 55, 0.1);
+        border: 1px solid rgba(212, 175, 55, 0.25);
+        border-radius: 999px;
+        font-weight: 600;
+    }
+
+    .feedback-title {
+        font-weight: 700;
+        margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* Progress */
+    .progress-container {
+        margin-top: auto;
+        padding-top: 16px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .progress-bar {
+        flex-grow: 1;
+        height: 6px;
+        background: rgba(45, 51, 59, 0.8);
+        border-radius: 3px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--gold-dark), var(--gold), var(--gold-light));
+        border-radius: 3px;
+        transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        width: 0%;
+        box-shadow: 0 0 12px rgba(212, 175, 55, 0.5);
+    }
+
+    .progress-text {
+        font-size: 0.8rem;
+        color: var(--text-dim);
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .next-btn-wrap {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 4px;
+    }
+
+    /* Экран результата */
+    .result-screen {
+        text-align: center;
+        justify-content: center;
+        align-items: center;
+        padding: 10px 0;
+    }
+
+    .result-emblem {
+        font-size: 4.5rem;
+        margin-bottom: 10px;
+        filter: drop-shadow(0 0 25px rgba(212, 175, 55, 0.5));
+        animation: emblemPop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes emblemPop {
+        0% { transform: scale(0) rotate(-45deg); opacity: 0; }
+        100% { transform: scale(1) rotate(0); opacity: 1; }
+    }
+
+    .result-screen h2 {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.4rem;
+        margin-bottom: 8px;
+        color: var(--gold-light);
+        font-weight: 700;
+    }
+
+    .result-score {
+        font-family: 'Playfair Display', serif;
+        font-size: 5rem;
+        color: var(--gold);
+        font-weight: 800;
+        line-height: 1;
+        margin: 10px 0 6px;
+        text-shadow: 0 0 40px rgba(212, 175, 55, 0.4);
+    }
+
+    .result-score-max {
+        font-size: 1rem;
+        color: var(--text-dim);
+        margin-bottom: 20px;
+    }
+
+    .result-verdict {
+        font-size: 1.15rem;
+        color: var(--text);
+        margin-bottom: 28px;
+        font-style: italic;
+        max-width: 500px;
+        line-height: 1.6;
+    }
+
+    .result-stats {
+        display: flex;
+        gap: 14px;
+        margin-bottom: 32px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .result-stat {
+        padding: 12px 22px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--card-border);
+        min-width: 110px;
+    }
+
+    .result-stat-label {
+        font-size: 0.72rem;
+        color: var(--text-dim);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 4px;
+    }
+
+    .result-stat-value {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--gold-light);
+    }
+
+    .result-stat-value.green { color: var(--green); }
+    .result-stat-value.red { color: var(--red); }
+
+    .new-record {
+        display: none;
+        margin-bottom: 16px;
+        padding: 8px 20px;
+        background: linear-gradient(135deg, rgba(212, 175, 55, 0.25), rgba(212, 175, 55, 0.1));
+        border: 1px solid var(--gold);
+        border-radius: 999px;
+        color: var(--gold-light);
+        font-weight: 700;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        animation: recordGlow 1.5s ease infinite;
+    }
+
+    .new-record.visible { display: inline-block; }
+
+    @keyframes recordGlow {
+        0%, 100% { box-shadow: 0 0 15px rgba(212, 175, 55, 0.3); }
+        50% { box-shadow: 0 0 30px rgba(212, 175, 55, 0.6); }
+    }
+
+    .footer {
+        padding: 14px 28px;
+        background: rgba(10, 15, 26, 0.6);
+        border-top: 1px solid rgba(45, 51, 59, 0.6);
+        font-size: 0.75rem;
+        color: var(--text-dim);
+        text-align: center;
+        letter-spacing: 0.3px;
+    }
+
+    .highlight {
+        color: var(--gold-light);
+        font-weight: 600;
+    }
+
+    /* Confetti */
+    .confetti {
+        position: fixed;
+        width: 10px;
+        height: 10px;
+        top: -20px;
+        pointer-events: none;
+        z-index: 10000;
+        border-radius: 2px;
+        animation: confettiFall linear forwards;
+    }
+
+    @keyframes confettiFall {
+        0% { transform: translateY(0) rotate(0); opacity: 1; }
+        100% { transform: translateY(105vh) rotate(720deg); opacity: 0; }
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+        body { padding: 10px; }
         .header {
-            background: linear-gradient(135deg, #0b2b3b, #1e4a5f);
-            padding: 20px 30px;
-            border-bottom: 3px solid #c9a84c;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .header h1 {
-            font-size: 1.6rem;
-            color: #f0e6d0;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
-            letter-spacing: 1px;
-        }
-
-        .score-box {
-            background: #0b2b3b;
-            padding: 8px 18px;
-            border-radius: 30px;
-            border: 1px solid #c9a84c;
-            font-weight: bold;
-            color: #f0e6d0;
-            font-size: 1.1rem;
-        }
-
-        .score-box span {
-            color: #f5d98b;
-        }
-
-        .content {
-            padding: 30px;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .screen {
-            display: none;
-            flex-direction: column;
-            flex-grow: 1;
-        }
-
-        .screen.active {
-            display: flex;
-        }
-
-        .start-screen {
-            text-align: center;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .start-screen h2 {
-            font-size: 2rem;
-            color: #f0e6d0;
-            margin-bottom: 20px;
-        }
-
-        .start-screen p {
-            font-size: 1.1rem;
-            margin-bottom: 30px;
-            color: #b0b8c0;
-            max-width: 600px;
-        }
-
-        .btn {
-            background: #c9a84c;
-            color: #1a1e24;
-            border: none;
-            padding: 14px 40px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            border-radius: 40px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-family: inherit;
-            box-shadow: 0 4px 0 #8a6f2e;
-            letter-spacing: 1px;
-        }
-
-        .btn:hover {
-            background: #e0c060;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 0 #8a6f2e;
-        }
-
-        .btn:active {
-            transform: translateY(2px);
-            box-shadow: 0 2px 0 #8a6f2e;
-        }
-
-        .btn:disabled {
-            background: #5a5a5a;
-            box-shadow: 0 4px 0 #333;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .question-screen {
-            justify-content: flex-start;
-        }
-
-        .scenario-box {
-            background: #2d333b;
-            border-left: 5px solid #c9a84c;
-            padding: 20px 25px;
-            margin-bottom: 25px;
-            border-radius: 0 12px 12px 0;
-            font-style: italic;
-            color: #d0d8e0;
-            font-size: 1.05rem;
-        }
-
-        .question-text {
-            font-size: 1.25rem;
-            font-weight: bold;
-            color: #f0e6d0;
-            margin-bottom: 20px;
-        }
-
-        .options {
-            display: flex;
             flex-direction: column;
             gap: 12px;
-            margin-bottom: 20px;
+            padding: 16px 20px;
         }
-
-        .option {
-            background: #2d333b;
-            border: 2px solid #3a404a;
-            border-radius: 12px;
-            padding: 15px 20px;
-            cursor: pointer;
-            transition: all 0.15s ease;
-            font-size: 1rem;
-            color: #e0e0e0;
-            text-align: left;
-            font-family: inherit;
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-        }
-
-        .option:hover:not(.disabled) {
-            border-color: #c9a84c;
-            background: #353c46;
-        }
-
-        .option.selected-correct {
-            border-color: #4caf50;
-            background: #1e3a2a;
-            box-shadow: 0 0 15px rgba(76, 175, 80, 0.2);
-        }
-
-        .option.selected-wrong {
-            border-color: #f44336;
-            background: #3a1e1e;
-            box-shadow: 0 0 15px rgba(244, 67, 54, 0.2);
-        }
-
-        .option.disabled {
-            cursor: default;
-            opacity: 0.8;
-        }
-
-        .option .letter {
-            font-weight: bold;
-            color: #c9a84c;
-            min-width: 24px;
-        }
-
-        .feedback {
-            margin-top: 10px;
-            padding: 15px 20px;
-            border-radius: 12px;
-            font-size: 0.95rem;
-            display: none;
-        }
-
-        .feedback.correct {
-            display: block;
-            background: #1e3a2a;
-            border: 1px solid #4caf50;
-            color: #b9f6ca;
-        }
-
-        .feedback.wrong {
-            display: block;
-            background: #3a1e1e;
-            border: 1px solid #f44336;
-            color: #ffcdd2;
-        }
-
-        .feedback .law-ref {
-            display: block;
-            margin-top: 8px;
-            font-size: 0.9rem;
-            color: #c9a84c;
-            font-weight: bold;
-        }
-
-        .result-screen {
-            text-align: center;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .result-screen h2 {
-            font-size: 2.2rem;
-            margin-bottom: 15px;
-            color: #f0e6d0;
-        }
-
-        .result-score {
-            font-size: 3.5rem;
-            color: #c9a84c;
-            font-weight: bold;
-            margin: 20px 0;
-            text-shadow: 0 0 20px rgba(201, 168, 76, 0.3);
-        }
-
-        .result-verdict {
-            font-size: 1.3rem;
-            color: #b0b8c0;
-            margin-bottom: 30px;
-            font-style: italic;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: #2d333b;
-            border-radius: 4px;
-            margin-top: 20px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #c9a84c, #e0c060);
-            border-radius: 4px;
-            transition: width 0.3s ease;
-            width: 0%;
-        }
-
-        .progress-text {
-            text-align: right;
-            font-size: 0.85rem;
-            color: #8892a0;
-            margin-top: 5px;
-        }
-
-        .footer {
-            padding: 15px 30px;
-            background: #1a1e24;
-            border-top: 1px solid #2d333b;
-            font-size: 0.8rem;
-            color: #5a6470;
-            text-align: center;
-        }
-
-        .highlight {
-            color: #f5d98b;
-            font-weight: bold;
-        }
-
-        @media (max-width: 600px) {
-            .header {
-                flex-direction: column;
-                gap: 10px;
-                text-align: center;
-            }
-            .header h1 {
-                font-size: 1.3rem;
-            }
-            .content {
-                padding: 20px;
-            }
-            .question-text {
-                font-size: 1.1rem;
-            }
-            .option {
-                font-size: 0.95rem;
-                padding: 12px 15px;
-            }
-        }
-    </style>
+        .header h1 { font-size: 1.2rem; }
+        .header-actions { width: 100%; justify-content: space-between; }
+        .content { padding: 20px 18px; }
+        .start-screen h2 { font-size: 1.8rem; }
+        .start-screen p { font-size: 0.95rem; }
+        .question-text { font-size: 1.1rem; }
+        .option { font-size: 0.92rem; padding: 13px 15px; }
+        .result-screen h2 { font-size: 1.8rem; }
+        .result-score { font-size: 3.8rem; }
+        .btn { padding: 13px 32px; font-size: 0.95rem; }
+        .scenario-box { font-size: 0.92rem; padding: 16px 18px; }
+    }
+</style>
 </head>
 <body>
-    <div class="game-container">
-        <div class="header">
-            <h1>🔍 Следователь СК</h1>
-            <div class="score-box">Очки: <span id="scoreDisplay">0</span></div>
-        </div>
 
-        <div class="content">
-            <!-- Стартовый экран -->
-            <div id="screen-start" class="screen start-screen active">
-                <h2>Интерактивный квест</h2>
-                <p>Вы — следователь Следственного комитета. Вам предстоит раскрыть дело о разбойном нападении, принимая процессуальные решения на основе Уголовного и Уголовно-процессуального кодексов РФ.</p>
-                <p>За правильные ответы вы получаете <span class="highlight">+10 очков</span>, за неправильные — <span class="highlight">−5 очков</span>.</p>
-                <button class="btn" onclick="startGame()">Начать расследование</button>
+<div class="bg-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+</div>
+
+<div class="game-container">
+    <div class="header">
+        <h1><span class="icon">🔍</span> Следователь СК</h1>
+        <div class="header-actions">
+            <div class="streak-badge" id="streakBadge">🔥 <span id="streakCount">0</span> подряд</div>
+            <div class="score-box" id="scoreBox">
+                Очки: <span id="scoreDisplay">0</span>
             </div>
-
-            <!-- Экран вопроса -->
-            <div id="screen-question" class="screen question-screen">
-                <div class="scenario-box" id="scenarioText"></div>
-                <div class="question-text" id="questionText"></div>
-                <div class="options" id="optionsContainer"></div>
-                <div class="feedback" id="feedbackBox"></div>
-                <div style="margin-top: auto; display: flex; justify-content: flex-end;">
-                    <button class="btn" id="nextBtn" onclick="nextQuestion()" disabled>Далее →</button>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progressFill"></div>
-                </div>
-                <div class="progress-text" id="progressText"></div>
-            </div>
-
-            <!-- Экран результата -->
-            <div id="screen-result" class="screen result-screen">
-                <h2>Дело закрыто</h2>
-                <div class="result-score" id="finalScore">0</div>
-                <div class="result-verdict" id="finalVerdict"></div>
-                <button class="btn" onclick="restartGame()">Начать заново</button>
-            </div>
-        </div>
-
-        <div class="footer">
-            УК РФ и УПК РФ — основа игры. Все совпадения с реальными делами случайны.
+            <button class="restart-icon-btn" id="restartBtn" title="Начать заново" style="display:none">↻</button>
         </div>
     </div>
 
-    <script>
-        // Данные игры
-        const questions = [
-            {
-                scenario: "В дежурную часть поступило сообщение о разбойном нападении на ювелирный магазин. Неизвестный, угрожая пистолетом, разбил витрину и похитил золотые украшения на сумму 1 500 000 рублей. Продавец не пострадала.",
-                question: "Какое решение должен принять следователь?",
-                options: [
-                    { text: "Возбудить уголовное дело по ст. 162 УК РФ (разбой)", correct: true },
-                    { text: "Отказать в возбуждении, так как нет заявления потерпевшего", correct: false },
-                    { text: "Возбудить уголовное дело по ст. 158 УК РФ (кража)", correct: false }
-                ],
-                explanation: "Разбой (ст. 162 УК РФ) — публичное обвинение. Дело возбуждается по сообщению о преступлении, независимо от заявления потерпевшего. Квалификация по ст. 158 неверна, так как было применено насилие (угроза пистолетом).",
-                law: "УК РФ, ст. 162; УПК РФ, ст. 140, 146"
-            },
-            {
-                scenario: "Вы возбудили уголовное дело. На месте происшествия обнаружены следы обуви, осколки витрины, гильза от пистолета. Продавец даёт показания.",
-                question: "Какое следственное действие необходимо провести в первую очередь для фиксации следов?",
-                options: [
-                    { text: "Осмотр места происшествия", correct: true },
-                    { text: "Допрос подозреваемого", correct: false },
-                    { text: "Обыск в квартире вероятного подозреваемого", correct: false }
-                ],
-                explanation: "Осмотр места происшествия — неотложное следственное действие, направленное на обнаружение и фиксацию следов преступления (ст. 176, 177 УПК РФ). Подозреваемого ещё нет, а обыск требует оснований.",
-                law: "УПК РФ, ст. 176, 177"
-            },
-            {
-                scenario: "В ходе оперативно-розыскных мероприятий задержан гражданин К., подозреваемый в совершении разбоя. Он был застигнут при попытке сбыть похищенные украшения.",
-                question: "Какой максимальный срок задержания подозреваемого без судебного решения допускается по УПК РФ?",
-                options: [
-                    { text: "48 часов", correct: true },
-                    { text: "72 часа", correct: false },
-                    { text: "24 часа", correct: false }
-                ],
-                explanation: "Согласно ст. 10 и ст. 94 УПК РФ, до судебного решения лицо не может быть подвергнуто задержанию на срок более 48 часов. По истечении этого срока оно подлежит освобождению, если суд не избрал меру пресечения.",
-                law: "УПК РФ, ст. 10, 94"
-            },
-            {
-                scenario: "Вы располагаете достаточными основаниями полагать, что подозреваемый К. может скрыться. Необходимо избрать меру пресечения в виде заключения под стражу.",
-                question: "Кто уполномочен принять решение о заключении под стражу?",
-                options: [
-                    { text: "Суд (судья районного суда)", correct: true },
-                    { text: "Следователь с согласия руководителя следственного органа", correct: false },
-                    { text: "Прокурор", correct: false }
-                ],
-                explanation: "Заключение под стражу — исключительная мера пресечения, применяемая только по судебному решению (ст. 108 УПК РФ). Следователь возбуждает ходатайство, но решение принимает суд.",
-                law: "УПК РФ, ст. 108"
-            },
-            {
-                scenario: "Подозреваемый К. сознался в содеянном и сообщил, что пистолет, которым он угрожал, является газовым, но он использовал его как предмет, имитирующий оружие. Украшения он планировал продать.",
-                question: "Как квалифицировать действия К. с учётом показаний и обстоятельств дела?",
-                options: [
-                    { text: "Ч. 2 ст. 162 УК РФ — разбой, совершённый с применением оружия или предметов, используемых в качестве оружия", correct: true },
-                    { text: "Ч. 1 ст. 162 УК РФ — разбой без квалифицирующих признаков", correct: false },
-                    { text: "Ст. 111 УК РФ — умышленное причинение тяжкого вреда здоровью", correct: false }
-                ],
-                explanation: "Использование газового пистолета (предмета, используемого в качестве оружия) при разбойном нападении образует квалифицированный состав по ч. 2 ст. 162 УК РФ. Вреда здоровью не причинено, поэтому ст. 111 неприменима.",
-                law: "УК РФ, ст. 162, ч. 2"
-            },
-            {
-                scenario: "При задержании К. заявил, что желает воспользоваться помощью защитника, но не может его пригласить, так как не имеет средств.",
-                question: "Какое право имеет подозреваемый в данном случае?",
-                options: [
-                    { text: "Право на бесплатную помощь защитника, предоставляемого государством", correct: true },
-                    { text: "Право отказаться от защитника и защищаться самостоятельно", correct: false },
-                    { text: "Право на один телефонный звонок", correct: false }
-                ],
-                explanation: "Подозреваемый имеет право на защитника, в том числе бесплатно, в случаях, предусмотренных законом (ст. 16, 46, 49, 51 УПК РФ). Следователь обязан обеспечить участие защитника, если подозреваемый не может его пригласить.",
-                law: "УПК РФ, ст. 16, 46, 49, 51"
+    <div class="content">
+        <!-- Стартовый экран -->
+        <div id="screen-start" class="screen start-screen active">
+            <div class="start-emblem">⚖️</div>
+            <h2>Интерактивный квест</h2>
+            <p>Вы — следователь Следственного комитета. Раскройте дело о разбойном нападении, принимая процессуальные решения на основе УК и УПК РФ.</p>
+            <p>За правильный ответ — <span class="highlight">+10 очков</span>, за ошибку — <span class="highlight">−5 очков</span>.</p>
+            <div class="start-stats">
+                <div class="start-stat">
+                    <span class="start-stat-label">Вопросов</span>
+                    <span class="start-stat-value">6</span>
+                </div>
+                <div class="start-stat">
+                    <span class="start-stat-label">Максимум</span>
+                    <span class="start-stat-value">60</span>
+                </div>
+                <div class="start-stat">
+                    <span class="start-stat-label">Рекорд</span>
+                    <span class="start-stat-value" id="bestScoreStart">—</span>
+                </div>
+            </div>
+            <button class="btn" onclick="startGame()">
+                Начать расследование
+                <span class="arrow">→</span>
+            </button>
+        </div>
+
+        <!-- Экран вопроса -->
+        <div id="screen-question" class="screen question-screen">
+            <div class="q-topbar">
+                <div class="category-badge" id="categoryBadge">📁 Категория</div>
+                <div class="question-counter">
+                    <span class="current" id="qCurrent">1</span> / <span id="qTotal">6</span>
+                </div>
+            </div>
+            <div class="scenario-box" id="scenarioText"></div>
+            <div class="question-text" id="questionText"></div>
+            <div class="options" id="optionsContainer"></div>
+            <div class="feedback" id="feedbackBox"></div>
+            <div class="next-btn-wrap">
+                <button class="btn" id="nextBtn" onclick="nextQuestion()" disabled>
+                    Далее <span class="arrow">→</span>
+                </button>
+            </div>
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text" id="progressText">0%</div>
+            </div>
+        </div>
+
+        <!-- Экран результата -->
+        <div id="screen-result" class="screen result-screen">
+            <div class="result-emblem" id="resultEmblem">🏆</div>
+            <div class="new-record" id="newRecord">✨ Новый рекорд!</div>
+            <h2>Дело закрыто</h2>
+            <div class="result-score" id="finalScore">0</div>
+            <div class="result-score-max" id="finalScoreMax">из 60 возможных</div>
+            <div class="result-verdict" id="finalVerdict"></div>
+            <div class="result-stats">
+                <div class="result-stat">
+                    <div class="result-stat-label">Верно</div>
+                    <div class="result-stat-value green" id="statCorrect">0</div>
+                </div>
+                <div class="result-stat">
+                    <div class="result-stat-label">Ошибок</div>
+                    <div class="result-stat-value red" id="statWrong">0</div>
+                </div>
+                <div class="result-stat">
+                    <div class="result-stat-label">Точность</div>
+                    <div class="result-stat-value" id="statAccuracy">0%</div>
+                </div>
+            </div>
+            <button class="btn" onclick="restartGame()">
+                Пройти заново
+                <span class="arrow">↻</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="footer">
+        УК РФ и УПК РФ — основа игры. Все совпадения с реальными делами случайны.
+    </div>
+</div>
+
+<script>
+    // Данные игры
+    const questions = [
+        {
+            category: "Возбуждение дела",
+            scenario: "В дежурную часть поступило сообщение о разбойном нападении на ювелирный магазин. Неизвестный, угрожая пистолетом, разбил витрину и похитил золотые украшения на сумму 1 500 000 рублей. Продавец не пострадала.",
+            question: "Какое решение должен принять следователь?",
+            options: [
+                { text: "Возбудить уголовное дело по ст. 162 УК РФ (разбой)", correct: true },
+                { text: "Отказать в возбуждении, так как нет заявления потерпевшего", correct: false },
+                { text: "Возбудить уголовное дело по ст. 158 УК РФ (кража)", correct: false }
+            ],
+            explanation: "Разбой (ст. 162 УК РФ) — публичное обвинение. Дело возбуждается по сообщению о преступлении, независимо от заявления потерпевшего. Квалификация по ст. 158 неверна, так как было применено насилие (угроза пистолетом).",
+            law: "УК РФ, ст. 162; УПК РФ, ст. 140, 146"
+        },
+        {
+            category: "Осмотр места",
+            scenario: "Вы возбудили уголовное дело. На месте происшествия обнаружены следы обуви, осколки витрины, гильза от пистолета. Продавец даёт показания.",
+            question: "Какое следственное действие необходимо провести в первую очередь для фиксации следов?",
+            options: [
+                { text: "Осмотр места происшествия", correct: true },
+                { text: "Допрос подозреваемого", correct: false },
+                { text: "Обыск в квартире вероятного подозреваемого", correct: false }
+            ],
+            explanation: "Осмотр места происшествия — неотложное следственное действие, направленное на обнаружение и фиксацию следов преступления (ст. 176, 177 УПК РФ). Подозреваемого ещё нет, а обыск требует оснований.",
+            law: "УПК РФ, ст. 176, 177"
+        },
+        {
+            category: "Задержание",
+            scenario: "В ходе оперативно-розыскных мероприятий задержан гражданин К., подозреваемый в совершении разбоя. Он был застигнут при попытке сбыть похищенные украшения.",
+            question: "Какой максимальный срок задержания подозреваемого без судебного решения допускается по УПК РФ?",
+            options: [
+                { text: "48 часов", correct: true },
+                { text: "72 часа", correct: false },
+                { text: "24 часа", correct: false }
+            ],
+            explanation: "Согласно ст. 10 и ст. 94 УПК РФ, до судебного решения лицо не может быть подвергнуто задержанию на срок более 48 часов. По истечении этого срока оно подлежит освобождению, если суд не избрал меру пресечения.",
+            law: "УПК РФ, ст. 10, 94"
+        },
+        {
+            category: "Мера пресечения",
+            scenario: "Вы располагаете достаточными основаниями полагать, что подозреваемый К. может скрыться. Необходимо избрать меру пресечения в виде заключения под стражу.",
+            question: "Кто уполномочен принять решение о заключении под стражу?",
+            options: [
+                { text: "Суд (судья районного суда)", correct: true },
+                { text: "Следователь с согласия руководителя следственного органа", correct: false },
+                { text: "Прокурор", correct: false }
+            ],
+            explanation: "Заключение под стражу — исключительная мера пресечения, применяемая только по судебному решению (ст. 108 УПК РФ). Следователь возбуждает ходатайство, но решение принимает суд.",
+            law: "УПК РФ, ст. 108"
+        },
+        {
+            category: "Квалификация",
+            scenario: "Подозреваемый К. сознался в содеянном и сообщил, что пистолет, которым он угрожал, является газовым, но он использовал его как предмет, имитирующий оружие. Украшения он планировал продать.",
+            question: "Как квалифицировать действия К. с учётом показаний и обстоятельств дела?",
+            options: [
+                { text: "Ч. 2 ст. 162 УК РФ — разбой с применением предметов, используемых в качестве оружия", correct: true },
+                { text: "Ч. 1 ст. 162 УК РФ — разбой без квалифицирующих признаков", correct: false },
+                { text: "Ст. 111 УК РФ — умышленное причинение тяжкого вреда здоровью", correct: false }
+            ],
+            explanation: "Использование газового пистолета (предмета, используемого в качестве оружия) при разбойном нападении образует квалифицированный состав по ч. 2 ст. 162 УК РФ. Вреда здоровью не причинено, поэтому ст. 111 неприменима.",
+            law: "УК РФ, ст. 162, ч. 2"
+        },
+        {
+            category: "Права защиты",
+            scenario: "При задержании К. заявил, что желает воспользоваться помощью защитника, но не может его пригласить, так как не имеет средств.",
+            question: "Какое право имеет подозреваемый в данном случае?",
+            options: [
+                { text: "Право на бесплатную помощь защитника, предоставляемого государством", correct: true },
+                { text: "Право отказаться от защитника и защищаться самостоятельно", correct: false },
+                { text: "Право на один телефонный звонок", correct: false }
+            ],
+            explanation: "Подозреваемый имеет право на защитника, в том числе бесплатно, в случаях, предусмотренных законом (ст. 16, 46, 49, 51 УПК РФ). Следователь обязан обеспечить участие защитника, если подозреваемый не может его пригласить.",
+            law: "УПК РФ, ст. 16, 46, 49, 51"
+        }
+    ];
+
+    // Состояние игры
+    const state = {
+        currentQuestionIndex: 0,
+        score: 0,
+        streak: 0,
+        answered: false,
+        correctCount: 0,
+        wrongCount: 0,
+        bestScore: parseInt(localStorage.getItem('investigator_best_score') || '0', 10) || 0
+    };
+
+    // DOM элементы
+    const $ = id => document.getElementById(id);
+    const scoreDisplay = $('scoreDisplay');
+    const scoreBox = $('scoreBox');
+    const streakBadge = $('streakBadge');
+    const streakCount = $('streakCount');
+    const restartBtn = $('restartBtn');
+    const screenStart = $('screen-start');
+    const screenQuestion = $('screen-question');
+    const screenResult = $('screen-result');
+    const categoryBadge = $('categoryBadge');
+    const qCurrent = $('qCurrent');
+    const qTotal = $('qTotal');
+    const scenarioText = $('scenarioText');
+    const questionText = $('questionText');
+    const optionsContainer = $('optionsContainer');
+    const feedbackBox = $('feedbackBox');
+    const nextBtn = $('nextBtn');
+    const progressFill = $('progressFill');
+    const progressText = $('progressText');
+    const finalScore = $('finalScore');
+    const finalScoreMax = $('finalScoreMax');
+    const finalVerdict = $('finalVerdict');
+    const resultEmblem = $('resultEmblem');
+    const newRecord = $('newRecord');
+    const statCorrect = $('statCorrect');
+    const statWrong = $('statWrong');
+    const statAccuracy = $('statAccuracy');
+    const bestScoreStart = $('bestScoreStart');
+
+    // Инициализация
+    function init() {
+        if (state.bestScore > 0) {
+            bestScoreStart.textContent = state.bestScore;
+        }
+        qTotal.textContent = questions.length;
+    }
+
+    function showScreen(screen) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        screen.classList.add('active');
+    }
+
+    function startGame() {
+        state.currentQuestionIndex = 0;
+        state.score = 0;
+        state.streak = 0;
+        state.answered = false;
+        state.correctCount = 0;
+        state.wrongCount = 0;
+        scoreDisplay.textContent = '0';
+        streakBadge.classList.remove('visible');
+        restartBtn.style.display = 'flex';
+        showScreen(screenQuestion);
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        state.answered = false;
+        nextBtn.disabled = true;
+        feedbackBox.className = 'feedback';
+        feedbackBox.innerHTML = '';
+
+        const q = questions[state.currentQuestionIndex];
+        categoryBadge.textContent = '📁 ' + q.category;
+        scenarioText.textContent = q.scenario;
+        questionText.textContent = q.question;
+
+        optionsContainer.innerHTML = '';
+        q.options.forEach((opt, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'option';
+            btn.innerHTML = `
+                <span class="letter">${String.fromCharCode(65 + index)}</span>
+                <span class="opt-text">${opt.text}</span>
+                <span class="check-icon"></span>
+            `;
+            btn.onclick = () => selectOption(index, btn);
+            optionsContainer.appendChild(btn);
+        });
+
+        qCurrent.textContent = state.currentQuestionIndex + 1;
+        const progress = (state.currentQuestionIndex / questions.length) * 100;
+        progressFill.style.width = progress + '%';
+        progressText.textContent = Math.round(progress) + '%';
+    }
+
+    function selectOption(index, btn) {
+        if (state.answered) return;
+        state.answered = true;
+
+        const q = questions[state.currentQuestionIndex];
+        const isCorrect = q.options[index].correct;
+        const allOptions = document.querySelectorAll('.option');
+
+        allOptions.forEach(opt => {
+            opt.classList.add('disabled');
+            opt.onclick = null;
+        });
+
+        if (isCorrect) {
+            btn.classList.add('selected-correct');
+            btn.querySelector('.check-icon').textContent = '✓';
+            state.score += 10;
+            state.correctCount++;
+            state.streak++;
+            createConfetti();
+        } else {
+            btn.classList.add('selected-wrong');
+            btn.querySelector('.check-icon').textContent = '✗';
+            state.score -= 5;
+            state.wrongCount++;
+            state.streak = 0;
+            const correctIndex = q.options.findIndex(o => o.correct);
+            if (correctIndex >= 0 && allOptions[correctIndex]) {
+                allOptions[correctIndex].classList.add('selected-correct');
+                allOptions[correctIndex].querySelector('.check-icon').textContent = '✓';
             }
-        ];
+        }
 
-        // Состояние игры
-        let currentQuestionIndex = 0;
-        let score = 0;
-        let answered = false;
+        updateScore();
+        updateStreak();
 
-        // DOM элементы
-        const screenStart = document.getElementById('screen-start');
-        const screenQuestion = document.getElementById('screen-question');
-        const screenResult = document.getElementById('screen-result');
-        const scoreDisplay = document.getElementById('scoreDisplay');
-        const scenarioText = document.getElementById('scenarioText');
-        const questionText = document.getElementById('questionText');
-        const optionsContainer = document.getElementById('optionsContainer');
-        const feedbackBox = document.getElementById('feedbackBox');
-        const nextBtn = document.getElementById('nextBtn');
-        const progressFill = document.getElementById('progressFill');
-        const progressText = document.getElementById('progressText');
-        const finalScore = document.getElementById('finalScore');
-        const finalVerdict = document.getElementById('finalVerdict');
+        feedbackBox.className = 'feedback ' + (isCorrect ? 'correct' : 'wrong');
+        feedbackBox.innerHTML = `
+            <div class="feedback-title">${isCorrect ? '✅ Верно!' : '❌ Неверно'}</div>
+            <div>${q.explanation}</div>
+            <span class="law-ref">⚖ ${q.law}</span>
+        `;
 
-        // Функции
-        function startGame() {
-            currentQuestionIndex = 0;
-            score = 0;
-            answered = false;
-            scoreDisplay.textContent = score;
-            showScreen(screenQuestion);
+        nextBtn.disabled = false;
+
+        if (state.currentQuestionIndex === questions.length - 1) {
+            nextBtn.innerHTML = 'Результаты <span class="arrow">→</span>';
+        }
+    }
+
+    function updateScore() {
+        const newScore = state.score;
+        scoreBox.classList.remove('pulse');
+        void scoreBox.offsetWidth;
+        scoreBox.classList.add('pulse');
+        animateValue(scoreDisplay, newScore);
+    }
+
+    function animateValue(element, target) {
+        const from = parseInt(element.textContent, 10) || 0;
+        const duration = 500;
+        const start = performance.now();
+        function step(now) {
+            const t = Math.min((now - start) / duration, 1);
+            const eased = 1 - Math.pow(1 - t, 3);
+            element.textContent = Math.round(from + (target - from) * eased);
+            if (t < 1) requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+    }
+
+    function updateStreak() {
+        if (state.streak >= 2) {
+            streakCount.textContent = state.streak;
+            streakBadge.classList.add('visible');
+        } else {
+            streakBadge.classList.remove('visible');
+        }
+    }
+
+    function nextQuestion() {
+        state.currentQuestionIndex++;
+        if (state.currentQuestionIndex < questions.length) {
             loadQuestion();
+        } else {
+            endGame();
+        }
+    }
+
+    function endGame() {
+        showScreen(screenResult);
+        restartBtn.style.display = 'none';
+        streakBadge.classList.remove('visible');
+
+        const totalPossible = questions.length * 10;
+        finalScoreMax.textContent = 'из ' + totalPossible + ' возможных';
+        statCorrect.textContent = state.correctCount;
+        statWrong.textContent = state.wrongCount;
+        const accuracy = Math.round((state.correctCount / questions.length) * 100);
+        statAccuracy.textContent = accuracy + '%';
+
+        // Анимированное появление счёта
+        finalScore.textContent = '0';
+        animateValue(finalScore, state.score);
+
+        // Рекорд
+        if (state.score > state.bestScore) {
+            state.bestScore = state.score;
+            localStorage.setItem('investigator_best_score', state.bestScore);
+            newRecord.classList.add('visible');
+            bestScoreStart.textContent = state.bestScore;
+        } else {
+            newRecord.classList.remove('visible');
         }
 
-        function showScreen(screen) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            screen.classList.add('active');
+        let verdict = '';
+        let emblem = '📚';
+        if (state.score >= 50) {
+            verdict = '🏆 Отличная работа! Вы — профессионал своего дела. Дело передано в суд.';
+            emblem = '🏆';
+        } else if (state.score >= 30) {
+            verdict = '👍 Хороший результат! Вы допустили небольшие ошибки, но дело раскрыто.';
+            emblem = '🥈';
+        } else if (state.score >= 10) {
+            verdict = '⚖️ Удовлетворительно. Стоит повторить УПК и УК РФ.';
+            emblem = '📖';
+        } else {
+            verdict = '📚 Вам нужно подтянуть знания кодексов. Попробуйте ещё раз!';
+            emblem = '📚';
         }
+        finalVerdict.textContent = verdict;
+        resultEmblem.textContent = emblem;
 
-        function loadQuestion() {
-            answered = false;
-            nextBtn.disabled = true;
-            feedbackBox.className = 'feedback';
-            feedbackBox.innerHTML = '';
+        if (state.score >= 50) createConfetti(60);
+    }
 
-            const q = questions[currentQuestionIndex];
-            scenarioText.textContent = q.scenario;
-            questionText.textContent = q.question;
+    function restartGame() {
+        startGame();
+    }
 
-            optionsContainer.innerHTML = '';
-            q.options.forEach((opt, index) => {
-                const btn = document.createElement('button');
-                btn.className = 'option';
-                btn.innerHTML = `<span class="letter">${String.fromCharCode(65 + index)}.</span> <span>${opt.text}</span>`;
-                btn.onclick = () => selectOption(index, btn);
-                optionsContainer.appendChild(btn);
-            });
-
-            // Обновление прогресса
-            const progress = ((currentQuestionIndex) / questions.length) * 100;
-            progressFill.style.width = progress + '%';
-            progressText.textContent = `Вопрос ${currentQuestionIndex + 1} из ${questions.length}`;
+    // Confetti эффект
+    function createConfetti(count = 30) {
+        const colors = ['#d4af37', '#f0d97d', '#4ade80', '#e8eaed', '#f87171'];
+        for (let i = 0; i < count; i++) {
+            const piece = document.createElement('div');
+            piece.className = 'confetti';
+            piece.style.left = Math.random() * 100 + 'vw';
+            piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+            piece.style.animationDuration = (1.5 + Math.random() * 1.5) + 's';
+            piece.style.animationDelay = Math.random() * 0.3 + 's';
+            piece.style.width = (6 + Math.random() * 8) + 'px';
+            piece.style.height = (6 + Math.random() * 8) + 'px';
+            document.body.appendChild(piece);
+            setTimeout(() => piece.remove(), 3500);
         }
+    }
 
-        function selectOption(index, btn) {
-            if (answered) return;
-            answered = true;
-
-            const q = questions[currentQuestionIndex];
-            const isCorrect = q.options[index].correct;
-
-            // Отключить все кнопки
-            document.querySelectorAll('.option').forEach(opt => {
-                opt.classList.add('disabled');
-                opt.onclick = null;
-            });
-
-            // Подсветка
-            if (isCorrect) {
-                btn.classList.add('selected-correct');
-                score += 10;
-                feedbackBox.className = 'feedback correct';
-                feedbackBox.innerHTML = `✅ Верно! ${q.explanation}<span class="law-ref">${q.law}</span>`;
-            } else {
-                btn.classList.add('selected-wrong');
-                score -= 5;
-                feedbackBox.className = 'feedback wrong';
-                // Найти правильный вариант для показа
-                const correctIndex = q.options.findIndex(o => o.correct);
-                const correctBtn = document.querySelectorAll('.option')[correctIndex];
-                if (correctBtn) correctBtn.classList.add('selected-correct');
-                feedbackBox.innerHTML = `❌ Неверно. ${q.explanation}<span class="law-ref">${q.law}</span>`;
-            }
-
-            scoreDisplay.textContent = score;
-            nextBtn.disabled = false;
-        }
-
-        function nextQuestion() {
-            currentQuestionIndex++;
-            if (currentQuestionIndex < questions.length) {
-                loadQuestion();
-            } else {
-                endGame();
-            }
-        }
-
-        function endGame() {
-            showScreen(screenResult);
-            finalScore.textContent = score;
-
-            let verdict = '';
-            if (score >= 50) {
-                verdict = '🏆 Отличная работа! Вы — профессионал своего дела. Дело передано в суд.';
-            } else if (score >= 30) {
-                verdict = '👍 Хороший результат! Вы допустили небольшие ошибки, но дело раскрыто.';
-            } else if (score >= 10) {
-                verdict = '⚖️ Удовлетворительно. Стоит повторить УПК и УК РФ.';
-            } else {
-                verdict = '📚 Вам нужно подтянуть знания кодексов. Попробуйте ещё раз!';
-            }
-            finalVerdict.textContent = verdict;
-        }
-
-        function restartGame() {
+    // Рестарт из хедера
+    restartBtn.addEventListener('click', () => {
+        if (confirm('Начать заново? Текущий прогресс будет потерян.')) {
             startGame();
         }
+    });
 
-        // Инициализация
-        scoreDisplay.textContent = '0';
-    </script>
+    // Инициализация
+    init();
+</script>
+
 </body>
 </html>
