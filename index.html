@@ -3,16 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Следователь СК — Интерактивный квест</title>
+<title>Следователь СК — Интерактивный квест и справочник</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-    * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
         --bg-dark: #0a0f1a;
@@ -23,175 +19,92 @@
         --gold-light: #f0d97d;
         --gold-dark: #8a6f2e;
         --green: #4ade80;
-        --green-dark: #166534;
         --red: #f87171;
-        --red-dark: #7f1d1d;
         --text: #e8eaed;
         --text-muted: #9aa0a6;
         --text-dim: #5a6470;
+        --blue: #60a5fa;
     }
 
-    html, body {
-        height: 100%;
-    }
+    html, body { height: 100%; }
 
     body {
         font-family: 'Inter', system-ui, sans-serif;
         background: var(--bg-dark);
         color: var(--text);
-        display: flex;
-        justify-content: center;
-        align-items: center;
         min-height: 100vh;
-        padding: 20px;
         line-height: 1.6;
         overflow-x: hidden;
         position: relative;
+        padding: 0;
     }
 
-    /* Анимированный фон */
-    .bg-orbs {
-        position: fixed;
-        inset: 0;
-        overflow: hidden;
-        pointer-events: none;
-        z-index: 0;
-    }
-
-    .orb {
-        position: absolute;
-        border-radius: 50%;
-        filter: blur(80px);
-        opacity: 0.35;
-        animation: float 20s infinite ease-in-out;
-    }
-
-    .orb-1 {
-        width: 500px;
-        height: 500px;
-        background: radial-gradient(circle, #1e4a5f, transparent 70%);
-        top: -10%;
-        left: -10%;
-        animation-delay: 0s;
-    }
-
-    .orb-2 {
-        width: 400px;
-        height: 400px;
-        background: radial-gradient(circle, #4a3b0f, transparent 70%);
-        bottom: -15%;
-        right: -10%;
-        animation-delay: -7s;
-    }
-
-    .orb-3 {
-        width: 300px;
-        height: 300px;
-        background: radial-gradient(circle, #1e3a2a, transparent 70%);
-        top: 40%;
-        right: 20%;
-        animation-delay: -14s;
-    }
-
+    /* Animated background */
+    .bg-orbs { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+    .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.35; animation: float 20s infinite ease-in-out; }
+    .orb-1 { width: 500px; height: 500px; background: radial-gradient(circle, #1e4a5f, transparent 70%); top: -10%; left: -10%; }
+    .orb-2 { width: 400px; height: 400px; background: radial-gradient(circle, #4a3b0f, transparent 70%); bottom: -15%; right: -10%; animation-delay: -7s; }
+    .orb-3 { width: 300px; height: 300px; background: radial-gradient(circle, #1e3a2a, transparent 70%); top: 40%; right: 20%; animation-delay: -14s; }
     @keyframes float {
         0%, 100% { transform: translate(0, 0) scale(1); }
         33% { transform: translate(40px, -30px) scale(1.1); }
         66% { transform: translate(-30px, 40px) scale(0.9); }
     }
 
-    /* Основной контейнер */
-    .game-container {
-        max-width: 900px;
-        width: 100%;
-        background: var(--card-bg);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border-radius: 24px;
-        border: 1px solid var(--card-border);
-        box-shadow:
-            0 30px 60px rgba(0, 0, 0, 0.6),
-            0 0 0 1px rgba(255, 255, 255, 0.03),
-            inset 0 1px 0 rgba(255, 255, 255, 0.05);
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-        min-height: 620px;
+    /* App wrapper */
+    .app {
+        max-width: 1100px;
+        margin: 20px auto;
+        width: calc(100% - 40px);
         position: relative;
         z-index: 1;
     }
 
     /* Header */
     .header {
-        background: linear-gradient(135deg, rgba(11, 43, 59, 0.9), rgba(30, 74, 95, 0.6));
-        padding: 20px 28px;
-        border-bottom: 1px solid var(--card-border);
+        background: var(--card-bg);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-radius: 20px;
+        border: 1px solid var(--card-border);
+        padding: 16px 24px;
         display: flex;
         justify-content: space-between;
         align-items: center;
         gap: 16px;
-        position: relative;
+        margin-bottom: 16px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
     }
 
-    .header::after {
-        content: '';
-        position: absolute;
-        bottom: -1px;
-        left: 0;
-        right: 0;
-        height: 2px;
-        background: linear-gradient(90deg, transparent, var(--gold), transparent);
-        opacity: 0.5;
-    }
-
-    .header h1 {
-        font-family: 'Playfair Display', serif;
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: var(--gold-light);
-        letter-spacing: 0.5px;
+    .brand {
         display: flex;
         align-items: center;
         gap: 10px;
+        font-family: 'Playfair Display', serif;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--gold-light);
+        letter-spacing: 0.3px;
+        white-space: nowrap;
     }
+    .brand .icon { font-size: 1.5rem; filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.5)); }
 
-    .header h1 .icon {
-        font-size: 1.6rem;
-        filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.5));
-    }
-
-    .header-actions {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
+    .header-right { display: flex; align-items: center; gap: 12px; }
 
     .score-box {
         background: rgba(11, 43, 59, 0.8);
-        padding: 8px 20px;
+        padding: 8px 18px;
         border-radius: 999px;
         border: 1px solid var(--card-border);
         font-weight: 600;
-        color: var(--text);
-        font-size: 0.95rem;
+        font-size: 0.9rem;
         display: flex;
         align-items: center;
         gap: 8px;
-        transition: all 0.3s ease;
+        white-space: nowrap;
     }
-
-    .score-box span {
-        color: var(--gold-light);
-        font-size: 1.15rem;
-        font-weight: 700;
-        min-width: 20px;
-        display: inline-block;
-        text-align: center;
-    }
-
-    .score-box.pulse {
-        animation: scorePulse 0.5s ease;
-    }
-
+    .score-box span { color: var(--gold-light); font-size: 1.1rem; font-weight: 700; min-width: 20px; display: inline-block; text-align: center; }
+    .score-box.pulse { animation: scorePulse 0.5s ease; }
     @keyframes scorePulse {
         0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4); }
         50% { transform: scale(1.1); box-shadow: 0 0 0 12px rgba(212, 175, 55, 0); }
@@ -199,158 +112,177 @@
     }
 
     .streak-badge {
-        display: none;
-        align-items: center;
-        gap: 6px;
+        display: none; align-items: center; gap: 6px;
         padding: 6px 14px;
         background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(212, 175, 55, 0.1));
         border: 1px solid rgba(212, 175, 55, 0.4);
         border-radius: 999px;
-        font-weight: 600;
-        font-size: 0.85rem;
-        color: var(--gold-light);
-        animation: streakPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        font-weight: 600; font-size: 0.82rem; color: var(--gold-light);
     }
+    .streak-badge.visible { display: flex; }
 
-    .streak-badge.visible {
-        display: flex;
-    }
-
-    @keyframes streakPop {
-        0% { transform: scale(0.5); opacity: 0; }
-        100% { transform: scale(1); opacity: 1; }
-    }
-
-    .restart-icon-btn {
-        background: transparent;
+    /* Nav */
+    .nav {
+        background: var(--card-bg);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-radius: 20px;
         border: 1px solid var(--card-border);
+        padding: 8px;
+        display: flex;
+        gap: 4px;
+        margin-bottom: 16px;
+        overflow-x: auto;
+        scrollbar-width: thin;
+        scrollbar-color: var(--gold-dark) transparent;
+    }
+    .nav::-webkit-scrollbar { height: 6px; }
+    .nav::-webkit-scrollbar-thumb { background: var(--gold-dark); border-radius: 3px; }
+
+    .nav-btn {
+        flex: 1;
+        min-width: 130px;
+        padding: 12px 18px;
+        background: transparent;
+        border: none;
+        border-radius: 14px;
         color: var(--text-muted);
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
+        font-family: inherit;
+        font-weight: 600;
+        font-size: 0.88rem;
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
+        gap: 8px;
         transition: all 0.2s ease;
-        font-size: 1rem;
+        white-space: nowrap;
     }
-
-    .restart-icon-btn:hover {
-        border-color: var(--gold);
+    .nav-btn .nav-icon { font-size: 1.1rem; }
+    .nav-btn:hover { color: var(--text); background: rgba(255, 255, 255, 0.03); }
+    .nav-btn.active {
+        background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(212, 175, 55, 0.05));
         color: var(--gold-light);
-        transform: rotate(-180deg);
+        border: 1px solid rgba(212, 175, 55, 0.3);
+        box-shadow: 0 4px 15px rgba(212, 175, 55, 0.1);
     }
 
-    /* Content */
-    .content {
-        padding: 32px 30px;
-        flex-grow: 1;
-        display: flex;
-        flex-direction: column;
-        position: relative;
+    /* Main section */
+    .main-panel {
+        background: var(--card-bg);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-radius: 20px;
+        border: 1px solid var(--card-border);
+        overflow: hidden;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        min-height: 500px;
     }
 
-    .screen {
-        display: none;
-        flex-direction: column;
-        flex-grow: 1;
-        animation: fadeInUp 0.4s ease;
-    }
+    .section { display: none; padding: 28px 30px; animation: fadeIn 0.3s ease; }
+    .section.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-    .screen.active {
-        display: flex;
-    }
-
-    @keyframes fadeInUp {
-        from { opacity: 0; transform: translateY(15px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Стартовый экран */
-    .start-screen {
+    /* Footer */
+    .footer {
         text-align: center;
-        justify-content: center;
-        align-items: center;
-        padding: 20px 0;
+        padding: 18px;
+        color: var(--text-dim);
+        font-size: 0.78rem;
+        letter-spacing: 0.3px;
     }
 
-    .start-emblem {
+    /* ===== HOME SECTION ===== */
+    .hero {
+        text-align: center;
+        padding: 20px 10px 30px;
+    }
+    .hero-emblem {
         font-size: 4rem;
-        margin-bottom: 8px;
-        filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.4));
+        margin-bottom: 10px;
+        filter: drop-shadow(0 0 25px rgba(212, 175, 55, 0.4));
         animation: emblemFloat 3s ease-in-out infinite;
     }
-
     @keyframes emblemFloat {
         0%, 100% { transform: translateY(0); }
         50% { transform: translateY(-8px); }
     }
-
-    .start-screen h2 {
+    .hero h1 {
         font-family: 'Playfair Display', serif;
-        font-size: 2.4rem;
+        font-size: 2.5rem;
         color: var(--gold-light);
-        margin-bottom: 16px;
+        margin-bottom: 14px;
         font-weight: 700;
         letter-spacing: 0.5px;
     }
-
-    .start-screen p {
-        font-size: 1.05rem;
-        margin-bottom: 14px;
+    .hero p {
         color: var(--text-muted);
-        max-width: 600px;
+        max-width: 640px;
+        margin: 0 auto 24px;
+        font-size: 1.02rem;
         line-height: 1.7;
     }
 
-    .start-stats {
-        display: flex;
-        gap: 24px;
-        margin: 24px 0 32px;
-        flex-wrap: wrap;
-        justify-content: center;
+    .hub-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-top: 24px;
     }
-
-    .start-stat {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 14px 24px;
+    .hub-card {
+        padding: 24px 20px;
         background: rgba(255, 255, 255, 0.02);
         border: 1px solid var(--card-border);
-        border-radius: 14px;
-        min-width: 120px;
+        border-radius: 16px;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        text-align: left;
+        font-family: inherit;
+        color: var(--text);
     }
-
-    .start-stat-label {
-        font-size: 0.75rem;
-        color: var(--text-dim);
-        text-transform: uppercase;
-        letter-spacing: 1px;
+    .hub-card:hover {
+        border-color: var(--gold);
+        background: rgba(212, 175, 55, 0.06);
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(212, 175, 55, 0.1);
+    }
+    .hub-card-icon { font-size: 2rem; margin-bottom: 10px; display: block; }
+    .hub-card-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.15rem;
+        color: var(--gold-light);
+        font-weight: 700;
         margin-bottom: 4px;
     }
+    .hub-card-desc { font-size: 0.87rem; color: var(--text-muted); line-height: 1.5; }
 
-    .start-stat-value {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: var(--gold-light);
-        font-family: 'Playfair Display', serif;
+    .best-score-display {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 18px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--card-border);
+        border-radius: 999px;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        margin-top: 8px;
     }
+    .best-score-display strong { color: var(--gold-light); font-size: 1.05rem; }
 
-    /* Кнопки */
+    /* ===== BUTTONS ===== */
     .btn {
         background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
         color: #1a1e24;
         border: none;
-        padding: 15px 42px;
-        font-size: 1.05rem;
+        padding: 14px 36px;
+        font-size: 1rem;
         font-weight: 700;
         border-radius: 999px;
         cursor: pointer;
         transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         font-family: inherit;
-        letter-spacing: 1px;
+        letter-spacing: 0.8px;
         box-shadow: 0 6px 20px rgba(212, 175, 55, 0.25), 0 2px 0 var(--gold-dark);
         display: inline-flex;
         align-items: center;
@@ -358,7 +290,6 @@
         position: relative;
         overflow: hidden;
     }
-
     .btn::before {
         content: '';
         position: absolute;
@@ -367,91 +298,61 @@
         transform: translateX(-100%);
         transition: transform 0.5s ease;
     }
-
-    .btn:hover::before {
-        transform: translateX(100%);
-    }
-
-    .btn:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 28px rgba(212, 175, 55, 0.35), 0 3px 0 var(--gold-dark);
-    }
-
-    .btn:active {
-        transform: translateY(1px);
-        box-shadow: 0 3px 10px rgba(212, 175, 55, 0.2), 0 1px 0 var(--gold-dark);
-    }
-
-    .btn:disabled {
-        background: linear-gradient(135deg, #3a404a, #4a505a);
-        box-shadow: 0 2px 0 #1e2228;
-        cursor: not-allowed;
-        transform: none;
-        opacity: 0.6;
-        color: var(--text-dim);
-    }
-
-    .btn .arrow {
-        transition: transform 0.25s ease;
-    }
-
-    .btn:not(:disabled):hover .arrow {
-        transform: translateX(4px);
-    }
+    .btn:hover::before { transform: translateX(100%); }
+    .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 28px rgba(212, 175, 55, 0.35), 0 3px 0 var(--gold-dark); }
+    .btn:active { transform: translateY(1px); box-shadow: 0 3px 10px rgba(212, 175, 55, 0.2), 0 1px 0 var(--gold-dark); }
+    .btn:disabled { background: linear-gradient(135deg, #3a404a, #4a505a); box-shadow: 0 2px 0 #1e2228; cursor: not-allowed; transform: none; opacity: 0.6; color: var(--text-dim); }
+    .btn .arrow { transition: transform 0.25s ease; }
+    .btn:not(:disabled):hover .arrow { transform: translateX(4px); }
 
     .btn-secondary {
         background: transparent;
         color: var(--text-muted);
         border: 1px solid var(--card-border);
         box-shadow: none;
-        padding: 12px 28px;
-        font-size: 0.95rem;
+        padding: 12px 24px;
+        font-size: 0.9rem;
     }
+    .btn-secondary:hover { border-color: var(--gold); color: var(--gold-light); box-shadow: 0 0 20px rgba(212, 175, 55, 0.15); }
 
-    .btn-secondary:hover {
-        border-color: var(--gold);
+    /* ===== GAME SECTION ===== */
+    .game-screen { display: none; animation: fadeIn 0.4s ease; }
+    .game-screen.active { display: block; }
+
+    .start-screen { text-align: center; padding: 20px 0; }
+    .start-emblem { font-size: 4rem; margin-bottom: 10px; filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.4)); }
+    .start-screen h2 {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.2rem;
         color: var(--gold-light);
-        box-shadow: 0 0 20px rgba(212, 175, 55, 0.15);
+        margin-bottom: 14px;
+        font-weight: 700;
     }
-
-    /* Экран вопроса */
-    .question-screen {
-        justify-content: flex-start;
+    .start-screen p { font-size: 1rem; margin-bottom: 12px; color: var(--text-muted); max-width: 560px; margin-left: auto; margin-right: auto; }
+    .start-stats { display: flex; gap: 20px; margin: 24px 0 28px; flex-wrap: wrap; justify-content: center; }
+    .start-stat {
+        display: flex; flex-direction: column; align-items: center;
+        padding: 14px 22px;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--card-border);
+        border-radius: 14px;
+        min-width: 110px;
     }
+    .start-stat-label { font-size: 0.72rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+    .start-stat-value { font-size: 1.4rem; font-weight: 700; color: var(--gold-light); font-family: 'Playfair Display', serif; }
 
-    .q-topbar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 16px;
-        gap: 12px;
-    }
-
+    .q-topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; gap: 12px; }
     .category-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
+        display: inline-flex; align-items: center; gap: 6px;
         padding: 5px 14px;
         background: rgba(212, 175, 55, 0.1);
         border: 1px solid rgba(212, 175, 55, 0.3);
         border-radius: 999px;
-        font-size: 0.78rem;
-        font-weight: 600;
-        color: var(--gold-light);
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
+        font-size: 0.75rem; font-weight: 600; color: var(--gold-light);
+        text-transform: uppercase; letter-spacing: 0.5px;
     }
-
-    .question-counter {
-        font-size: 0.85rem;
-        color: var(--text-dim);
-        font-weight: 600;
-    }
-
-    .question-counter .current {
-        color: var(--gold-light);
-        font-size: 1.05rem;
-    }
+    .question-counter { font-size: 0.85rem; color: var(--text-dim); font-weight: 600; }
+    .question-counter .current { color: var(--gold-light); font-size: 1.05rem; }
 
     .scenario-box {
         background: linear-gradient(135deg, rgba(45, 51, 59, 0.8), rgba(30, 38, 50, 0.6));
@@ -464,14 +365,11 @@
         font-size: 1rem;
         line-height: 1.65;
         position: relative;
-        animation: slideInLeft 0.5s ease;
     }
-
     .scenario-box::before {
         content: '"';
         position: absolute;
-        top: -10px;
-        left: 12px;
+        top: -12px; left: 12px;
         font-family: 'Playfair Display', serif;
         font-size: 4rem;
         color: var(--gold);
@@ -479,28 +377,16 @@
         line-height: 1;
     }
 
-    @keyframes slideInLeft {
-        from { opacity: 0; transform: translateX(-20px); }
-        to { opacity: 1; transform: translateX(0); }
-    }
-
     .question-text {
         font-family: 'Playfair Display', serif;
-        font-size: 1.35rem;
+        font-size: 1.3rem;
         font-weight: 600;
         color: var(--gold-light);
-        margin-bottom: 22px;
-        line-height: 1.4;
-        animation: fadeInUp 0.4s ease 0.1s both;
-    }
-
-    .options {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
         margin-bottom: 20px;
+        line-height: 1.4;
     }
 
+    .options { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
     .option {
         background: rgba(45, 51, 59, 0.7);
         border: 1.5px solid rgba(58, 64, 74, 0.8);
@@ -516,41 +402,24 @@
         align-items: center;
         gap: 14px;
         width: 100%;
-        position: relative;
-        animation: fadeInUp 0.4s ease both;
     }
-
-    .option:nth-child(1) { animation-delay: 0.15s; }
-    .option:nth-child(2) { animation-delay: 0.22s; }
-    .option:nth-child(3) { animation-delay: 0.29s; }
-
     .option:hover:not(.disabled) {
         border-color: var(--gold);
         background: rgba(56, 63, 76, 0.9);
         transform: translateX(6px);
         box-shadow: 0 4px 20px rgba(212, 175, 55, 0.15);
     }
-
     .option.selected-correct {
         border-color: var(--green);
         background: linear-gradient(135deg, rgba(30, 58, 42, 0.9), rgba(22, 101, 52, 0.3));
         box-shadow: 0 0 25px rgba(74, 222, 128, 0.25);
-        animation: correctPulse 0.5s ease;
     }
-
-    @keyframes correctPulse {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.02); }
-        100% { transform: scale(1); }
-    }
-
     .option.selected-wrong {
         border-color: var(--red);
         background: linear-gradient(135deg, rgba(58, 30, 30, 0.9), rgba(127, 29, 29, 0.3));
         box-shadow: 0 0 25px rgba(248, 113, 113, 0.25);
         animation: wrongShake 0.5s ease;
     }
-
     @keyframes wrongShake {
         0%, 100% { transform: translateX(0); }
         20% { transform: translateX(-8px); }
@@ -558,91 +427,39 @@
         60% { transform: translateX(-5px); }
         80% { transform: translateX(5px); }
     }
-
-    .option.disabled {
-        cursor: default;
-    }
-
-    .option.disabled:not(.selected-correct):not(.selected-wrong) {
-        opacity: 0.5;
-    }
-
+    .option.disabled { cursor: default; }
+    .option.disabled:not(.selected-correct):not(.selected-wrong) { opacity: 0.5; }
     .option .letter {
         font-family: 'Playfair Display', serif;
         font-weight: 700;
         color: var(--gold);
-        min-width: 30px;
-        height: 30px;
+        min-width: 30px; height: 30px;
         border-radius: 50%;
         background: rgba(212, 175, 55, 0.12);
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        display: flex; align-items: center; justify-content: center;
         font-size: 0.9rem;
-        transition: all 0.2s ease;
         flex-shrink: 0;
     }
+    .option.selected-correct .letter { background: var(--green); color: var(--bg-dark); }
+    .option.selected-wrong .letter { background: var(--red); color: var(--bg-dark); }
+    .option .check-icon { margin-left: auto; font-size: 1.2rem; opacity: 0; }
+    .option.selected-correct .check-icon, .option.selected-wrong .check-icon { opacity: 1; }
 
-    .option:hover:not(.disabled) .letter {
-        background: rgba(212, 175, 55, 0.25);
-        transform: scale(1.1);
-    }
-
-    .option.selected-correct .letter {
-        background: var(--green);
-        color: var(--bg-dark);
-    }
-
-    .option.selected-wrong .letter {
-        background: var(--red);
-        color: var(--bg-dark);
-    }
-
-    .option .check-icon {
-        margin-left: auto;
-        font-size: 1.2rem;
-        opacity: 0;
-        transition: opacity 0.2s ease;
-    }
-
-    .option.selected-correct .check-icon,
-    .option.selected-wrong .check-icon {
-        opacity: 1;
-    }
-
-    .feedback {
-        margin-top: 6px;
-        padding: 16px 20px;
-        border-radius: 14px;
-        font-size: 0.95rem;
-        display: none;
-        animation: feedbackSlide 0.4s ease;
-        line-height: 1.6;
-    }
-
-    @keyframes feedbackSlide {
-        from { opacity: 0; transform: translateY(-10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
+    .feedback { margin-top: 6px; padding: 16px 20px; border-radius: 14px; font-size: 0.95rem; display: none; line-height: 1.6; }
     .feedback.correct {
         display: block;
         background: linear-gradient(135deg, rgba(30, 58, 42, 0.7), rgba(22, 101, 52, 0.2));
         border: 1px solid rgba(74, 222, 128, 0.4);
         color: #bbf7d0;
     }
-
     .feedback.wrong {
         display: block;
         background: linear-gradient(135deg, rgba(58, 30, 30, 0.7), rgba(127, 29, 29, 0.2));
         border: 1px solid rgba(248, 113, 113, 0.4);
         color: #fecaca;
     }
-
     .feedback .law-ref {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
+        display: inline-flex; align-items: center; gap: 6px;
         margin-top: 10px;
         padding: 4px 12px;
         font-size: 0.8rem;
@@ -652,33 +469,10 @@
         border-radius: 999px;
         font-weight: 600;
     }
+    .feedback-title { font-weight: 700; margin-bottom: 6px; }
 
-    .feedback-title {
-        font-weight: 700;
-        margin-bottom: 6px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    /* Progress */
-    .progress-container {
-        margin-top: auto;
-        padding-top: 16px;
-        display: flex;
-        align-items: center;
-        gap: 14px;
-    }
-
-    .progress-bar {
-        flex-grow: 1;
-        height: 6px;
-        background: rgba(45, 51, 59, 0.8);
-        border-radius: 3px;
-        overflow: hidden;
-        position: relative;
-    }
-
+    .progress-container { margin-top: 20px; padding-top: 16px; display: flex; align-items: center; gap: 14px; }
+    .progress-bar { flex-grow: 1; height: 6px; background: rgba(45, 51, 59, 0.8); border-radius: 3px; overflow: hidden; }
     .progress-fill {
         height: 100%;
         background: linear-gradient(90deg, var(--gold-dark), var(--gold), var(--gold-light));
@@ -687,155 +481,303 @@
         width: 0%;
         box-shadow: 0 0 12px rgba(212, 175, 55, 0.5);
     }
+    .progress-text { font-size: 0.8rem; color: var(--text-dim); font-weight: 600; white-space: nowrap; }
 
-    .progress-text {
-        font-size: 0.8rem;
-        color: var(--text-dim);
-        font-weight: 600;
-        white-space: nowrap;
-    }
+    .next-btn-wrap { display: flex; justify-content: flex-end; margin-top: 14px; }
 
-    .next-btn-wrap {
-        display: flex;
-        justify-content: flex-end;
-        margin-top: 4px;
-    }
-
-    /* Экран результата */
-    .result-screen {
-        text-align: center;
-        justify-content: center;
-        align-items: center;
-        padding: 10px 0;
-    }
-
-    .result-emblem {
-        font-size: 4.5rem;
-        margin-bottom: 10px;
-        filter: drop-shadow(0 0 25px rgba(212, 175, 55, 0.5));
-        animation: emblemPop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-
-    @keyframes emblemPop {
-        0% { transform: scale(0) rotate(-45deg); opacity: 0; }
-        100% { transform: scale(1) rotate(0); opacity: 1; }
-    }
-
-    .result-screen h2 {
-        font-family: 'Playfair Display', serif;
-        font-size: 2.4rem;
-        margin-bottom: 8px;
-        color: var(--gold-light);
-        font-weight: 700;
-    }
-
+    .result-screen { text-align: center; padding: 10px 0; }
+    .result-emblem { font-size: 4.5rem; margin-bottom: 10px; animation: emblemPop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1); }
+    @keyframes emblemPop { 0% { transform: scale(0) rotate(-45deg); opacity: 0; } 100% { transform: scale(1) rotate(0); opacity: 1; } }
+    .result-screen h2 { font-family: 'Playfair Display', serif; font-size: 2.2rem; margin-bottom: 8px; color: var(--gold-light); font-weight: 700; }
     .result-score {
         font-family: 'Playfair Display', serif;
-        font-size: 5rem;
+        font-size: 4.5rem;
         color: var(--gold);
         font-weight: 800;
         line-height: 1;
         margin: 10px 0 6px;
         text-shadow: 0 0 40px rgba(212, 175, 55, 0.4);
     }
-
-    .result-score-max {
-        font-size: 1rem;
-        color: var(--text-dim);
-        margin-bottom: 20px;
-    }
-
-    .result-verdict {
-        font-size: 1.15rem;
-        color: var(--text);
-        margin-bottom: 28px;
-        font-style: italic;
-        max-width: 500px;
-        line-height: 1.6;
-    }
-
-    .result-stats {
-        display: flex;
-        gap: 14px;
-        margin-bottom: 32px;
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-
-    .result-stat {
-        padding: 12px 22px;
-        border-radius: 14px;
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid var(--card-border);
-        min-width: 110px;
-    }
-
-    .result-stat-label {
-        font-size: 0.72rem;
-        color: var(--text-dim);
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        margin-bottom: 4px;
-    }
-
-    .result-stat-value {
-        font-size: 1.3rem;
-        font-weight: 700;
-        color: var(--gold-light);
-    }
-
+    .result-score-max { font-size: 1rem; color: var(--text-dim); margin-bottom: 20px; }
+    .result-verdict { font-size: 1.1rem; color: var(--text); margin-bottom: 24px; font-style: italic; max-width: 500px; margin-left: auto; margin-right: auto; }
+    .result-stats { display: flex; gap: 12px; margin-bottom: 28px; flex-wrap: wrap; justify-content: center; }
+    .result-stat { padding: 12px 22px; border-radius: 14px; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--card-border); min-width: 110px; }
+    .result-stat-label { font-size: 0.72rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+    .result-stat-value { font-size: 1.3rem; font-weight: 700; color: var(--gold-light); }
     .result-stat-value.green { color: var(--green); }
     .result-stat-value.red { color: var(--red); }
 
     .new-record {
         display: none;
-        margin-bottom: 16px;
+        margin-bottom: 14px;
         padding: 8px 20px;
         background: linear-gradient(135deg, rgba(212, 175, 55, 0.25), rgba(212, 175, 55, 0.1));
         border: 1px solid var(--gold);
         border-radius: 999px;
         color: var(--gold-light);
         font-weight: 700;
-        font-size: 0.85rem;
+        font-size: 0.82rem;
         text-transform: uppercase;
         letter-spacing: 1px;
         animation: recordGlow 1.5s ease infinite;
     }
-
     .new-record.visible { display: inline-block; }
-
     @keyframes recordGlow {
         0%, 100% { box-shadow: 0 0 15px rgba(212, 175, 55, 0.3); }
         50% { box-shadow: 0 0 30px rgba(212, 175, 55, 0.6); }
     }
 
-    .footer {
-        padding: 14px 28px;
-        background: rgba(10, 15, 26, 0.6);
-        border-top: 1px solid rgba(45, 51, 59, 0.6);
-        font-size: 0.75rem;
-        color: var(--text-dim);
-        text-align: center;
-        letter-spacing: 0.3px;
-    }
-
-    .highlight {
+    /* ===== CALCULATOR SECTION ===== */
+    .section-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.9rem;
         color: var(--gold-light);
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+    .section-desc { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 24px; line-height: 1.6; }
+
+    .calc-form {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--card-border);
+        border-radius: 16px;
+        padding: 24px;
+        margin-bottom: 20px;
+    }
+    .calc-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+    @media (max-width: 640px) { .calc-row { grid-template-columns: 1fr; } }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field-label {
+        font-size: 0.8rem;
+        color: var(--text-dim);
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
         font-weight: 600;
     }
+    .field input, .field select {
+        padding: 12px 16px;
+        background: rgba(20, 27, 40, 0.9);
+        border: 1.5px solid var(--card-border);
+        border-radius: 12px;
+        color: var(--text);
+        font-family: inherit;
+        font-size: 0.95rem;
+        transition: all 0.2s ease;
+        color-scheme: dark;
+    }
+    .field input:focus, .field select:focus {
+        outline: none;
+        border-color: var(--gold);
+        box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+    }
+    .field select { cursor: pointer; }
+    .field select option { background: #141b28; color: var(--text); padding: 8px; }
 
-    /* Confetti */
-    .confetti {
-        position: fixed;
-        width: 10px;
-        height: 10px;
-        top: -20px;
-        pointer-events: none;
-        z-index: 10000;
-        border-radius: 2px;
-        animation: confettiFall linear forwards;
+    .calc-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+
+    .calc-result {
+        background: linear-gradient(135deg, rgba(212, 175, 55, 0.08), rgba(212, 175, 55, 0.02));
+        border: 1px solid rgba(212, 175, 55, 0.3);
+        border-radius: 16px;
+        padding: 24px;
+        animation: fadeIn 0.4s ease;
+    }
+    .calc-result-empty {
+        text-align: center;
+        padding: 40px 20px;
+        color: var(--text-dim);
+        font-style: italic;
+        background: rgba(255, 255, 255, 0.01);
+        border: 1px dashed var(--card-border);
+        border-radius: 16px;
     }
 
+    .result-main-date {
+        font-family: 'Playfair Display', serif;
+        font-size: 2rem;
+        color: var(--gold-light);
+        font-weight: 700;
+        margin-bottom: 4px;
+    }
+    .result-main-sub { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 18px; }
+    .result-article {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 5px 14px;
+        background: rgba(212, 175, 55, 0.15);
+        border: 1px solid rgba(212, 175, 55, 0.35);
+        border-radius: 999px;
+        font-size: 0.82rem;
+        color: var(--gold-light);
+        font-weight: 600;
+        margin-bottom: 16px;
+    }
+    .result-desc { color: var(--text-muted); font-size: 0.92rem; margin-bottom: 20px; line-height: 1.6; }
+
+    .extensions-title {
+        font-size: 0.82rem;
+        color: var(--text-dim);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 600;
+        margin-bottom: 10px;
+        margin-top: 20px;
+    }
+
+    .extension-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--card-border);
+        border-radius: 10px;
+        margin-bottom: 8px;
+        flex-wrap: wrap;
+    }
+    .extension-label { font-weight: 600; color: var(--text); font-size: 0.92rem; }
+    .extension-by { font-size: 0.78rem; color: var(--text-dim); margin-top: 2px; }
+    .extension-date {
+        font-family: 'Playfair Display', serif;
+        font-weight: 700;
+        color: var(--gold-light);
+        font-size: 1rem;
+        white-space: nowrap;
+    }
+
+    .calc-note {
+        margin-top: 20px;
+        padding: 14px 18px;
+        background: rgba(96, 165, 250, 0.06);
+        border: 1px solid rgba(96, 165, 250, 0.25);
+        border-radius: 12px;
+        font-size: 0.82rem;
+        color: #bfdbfe;
+        line-height: 1.6;
+    }
+
+    /* ===== REFERENCE SECTION ===== */
+    .ref-grid { display: grid; gap: 14px; }
+    .ref-card {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--card-border);
+        border-radius: 14px;
+        padding: 20px 22px;
+        transition: all 0.2s ease;
+    }
+    .ref-card:hover { border-color: rgba(212, 175, 55, 0.4); background: rgba(212, 175, 55, 0.03); }
+    .ref-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 16px;
+        margin-bottom: 10px;
+        flex-wrap: wrap;
+    }
+    .ref-card-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--gold-light); font-weight: 700; line-height: 1.3; }
+    .ref-card-article {
+        padding: 4px 12px;
+        background: rgba(212, 175, 55, 0.12);
+        border: 1px solid rgba(212, 175, 55, 0.3);
+        border-radius: 999px;
+        font-size: 0.75rem;
+        color: var(--gold-light);
+        font-weight: 600;
+        white-space: nowrap;
+    }
+    .ref-card-srok {
+        display: inline-block;
+        font-family: 'Playfair Display', serif;
+        font-size: 1.4rem;
+        color: var(--gold);
+        font-weight: 800;
+        margin-bottom: 8px;
+    }
+    .ref-card-desc { color: var(--text-muted); font-size: 0.9rem; line-height: 1.55; margin-bottom: 10px; }
+    .ref-card-ext {
+        padding-left: 16px;
+        margin-top: 8px;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        line-height: 1.6;
+    }
+    .ref-card-ext li { margin-bottom: 4px; list-style: disc; }
+    .ref-category-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.2rem;
+        color: var(--gold-light);
+        font-weight: 700;
+        margin-top: 24px;
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--card-border);
+    }
+    .ref-category-title:first-child { margin-top: 0; }
+
+    /* ===== FILES SECTION ===== */
+    .files-grid { display: grid; gap: 12px; }
+    .file-card {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 16px 20px;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--card-border);
+        border-radius: 14px;
+        text-decoration: none;
+        color: var(--text);
+        transition: all 0.2s ease;
+    }
+    .file-card:hover {
+        border-color: var(--gold);
+        background: rgba(212, 175, 55, 0.05);
+        transform: translateX(4px);
+    }
+    .file-icon {
+        font-size: 1.8rem;
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(212, 175, 55, 0.1);
+        border-radius: 10px;
+        flex-shrink: 0;
+    }
+    .file-info { flex-grow: 1; min-width: 0; }
+    .file-name {
+        font-weight: 600;
+        color: var(--gold-light);
+        font-size: 0.95rem;
+        margin-bottom: 2px;
+        word-break: break-word;
+    }
+    .file-desc { font-size: 0.82rem; color: var(--text-muted); line-height: 1.4; }
+    .file-meta { font-size: 0.72rem; color: var(--text-dim); margin-top: 4px; display: flex; gap: 10px; flex-wrap: wrap; }
+    .file-meta span { padding: 1px 6px; background: rgba(255,255,255,0.04); border-radius: 4px; }
+    .file-arrow { color: var(--text-dim); font-size: 1.2rem; transition: all 0.2s; flex-shrink: 0; }
+    .file-card:hover .file-arrow { color: var(--gold-light); transform: translateX(4px); }
+
+    .files-note {
+        margin-top: 20px;
+        padding: 16px 20px;
+        background: rgba(212, 175, 55, 0.06);
+        border: 1px solid rgba(212, 175, 55, 0.25);
+        border-radius: 12px;
+        font-size: 0.85rem;
+        color: #fde68a;
+        line-height: 1.6;
+    }
+    .files-note strong { color: var(--gold-light); }
+
+    /* Confetti */
+    .confetti { position: fixed; width: 10px; height: 10px; top: -20px; pointer-events: none; z-index: 10000; border-radius: 2px; animation: confettiFall linear forwards; }
     @keyframes confettiFall {
         0% { transform: translateY(0) rotate(0); opacity: 1; }
         100% { transform: translateY(105vh) rotate(720deg); opacity: 0; }
@@ -843,23 +785,26 @@
 
     /* Responsive */
     @media (max-width: 640px) {
-        body { padding: 10px; }
-        .header {
-            flex-direction: column;
-            gap: 12px;
-            padding: 16px 20px;
-        }
-        .header h1 { font-size: 1.2rem; }
-        .header-actions { width: 100%; justify-content: space-between; }
-        .content { padding: 20px 18px; }
-        .start-screen h2 { font-size: 1.8rem; }
-        .start-screen p { font-size: 0.95rem; }
+        .app { width: calc(100% - 16px); margin: 8px auto; }
+        .header { padding: 12px 16px; flex-wrap: wrap; gap: 10px; }
+        .brand { font-size: 1.05rem; }
+        .brand .icon { font-size: 1.2rem; }
+        .nav { padding: 6px; }
+        .nav-btn { min-width: 100px; padding: 10px 12px; font-size: 0.8rem; }
+        .nav-btn .nav-icon { font-size: 1rem; }
+        .section { padding: 20px 16px; }
+        .section-title { font-size: 1.5rem; }
+        .hero h1 { font-size: 1.7rem; }
+        .hero-emblem { font-size: 3rem; }
+        .hub-cards { grid-template-columns: 1fr; }
         .question-text { font-size: 1.1rem; }
-        .option { font-size: 0.92rem; padding: 13px 15px; }
+        .option { padding: 13px 15px; font-size: 0.92rem; }
         .result-screen h2 { font-size: 1.8rem; }
-        .result-score { font-size: 3.8rem; }
-        .btn { padding: 13px 32px; font-size: 0.95rem; }
-        .scenario-box { font-size: 0.92rem; padding: 16px 18px; }
+        .result-score { font-size: 3.5rem; }
+        .btn { padding: 12px 28px; font-size: 0.92rem; }
+        .start-screen h2 { font-size: 1.6rem; }
+        .result-main-date { font-size: 1.5rem; }
+        .calc-form { padding: 18px; }
     }
 </style>
 </head>
@@ -871,445 +816,862 @@
     <div class="orb orb-3"></div>
 </div>
 
-<div class="game-container">
-    <div class="header">
-        <h1><span class="icon">🔍</span> Следователь СК</h1>
-        <div class="header-actions">
+<div class="app">
+    <!-- Header -->
+    <header class="header">
+        <div class="brand">
+            <span class="icon">🔍</span> Следователь СК
+        </div>
+        <div class="header-right">
             <div class="streak-badge" id="streakBadge">🔥 <span id="streakCount">0</span> подряд</div>
-            <div class="score-box" id="scoreBox">
-                Очки: <span id="scoreDisplay">0</span>
-            </div>
-            <button class="restart-icon-btn" id="restartBtn" title="Начать заново" style="display:none">↻</button>
+            <div class="score-box" id="scoreBox">Очки: <span id="scoreDisplay">0</span></div>
         </div>
-    </div>
+    </header>
 
-    <div class="content">
-        <!-- Стартовый экран -->
-        <div id="screen-start" class="screen start-screen active">
-            <div class="start-emblem">⚖️</div>
-            <h2>Интерактивный квест</h2>
-            <p>Вы — следователь Следственного комитета. Раскройте дело о разбойном нападении, принимая процессуальные решения на основе УК и УПК РФ.</p>
-            <p>За правильный ответ — <span class="highlight">+10 очков</span>, за ошибку — <span class="highlight">−5 очков</span>.</p>
-            <div class="start-stats">
-                <div class="start-stat">
-                    <span class="start-stat-label">Вопросов</span>
-                    <span class="start-stat-value">6</span>
-                </div>
-                <div class="start-stat">
-                    <span class="start-stat-label">Максимум</span>
-                    <span class="start-stat-value">60</span>
-                </div>
-                <div class="start-stat">
-                    <span class="start-stat-label">Рекорд</span>
-                    <span class="start-stat-value" id="bestScoreStart">—</span>
+    <!-- Navigation -->
+    <nav class="nav" id="mainNav">
+        <button class="nav-btn active" data-section="home"><span class="nav-icon">🏠</span> Главное</button>
+        <button class="nav-btn" data-section="game"><span class="nav-icon">🎮</span> Квест</button>
+        <button class="nav-btn" data-section="calc"><span class="nav-icon">⏱</span> Калькулятор сроков</button>
+        <button class="nav-btn" data-section="ref"><span class="nav-icon">📋</span> Сроки</button>
+        <button class="nav-btn" data-section="files"><span class="nav-icon">📚</span> Файлы</button>
+    </nav>
+
+    <!-- Main panel -->
+    <main class="main-panel">
+
+        <!-- ===== HOME ===== -->
+        <section class="section active" id="section-home">
+            <div class="hero">
+                <div class="hero-emblem">⚖️</div>
+                <h1>Следователь СК</h1>
+                <p>Интерактивный квест по УК и УПК РФ, калькулятор процессуальных сроков и справочник для начинающих следователей.</p>
+                <div class="best-score-display" id="bestScoreHub">
+                    🏆 Лучший результат: <strong id="bestScoreValue">—</strong>
                 </div>
             </div>
-            <button class="btn" onclick="startGame()">
-                Начать расследование
-                <span class="arrow">→</span>
-            </button>
-        </div>
 
-        <!-- Экран вопроса -->
-        <div id="screen-question" class="screen question-screen">
-            <div class="q-topbar">
-                <div class="category-badge" id="categoryBadge">📁 Категория</div>
-                <div class="question-counter">
-                    <span class="current" id="qCurrent">1</span> / <span id="qTotal">6</span>
-                </div>
-            </div>
-            <div class="scenario-box" id="scenarioText"></div>
-            <div class="question-text" id="questionText"></div>
-            <div class="options" id="optionsContainer"></div>
-            <div class="feedback" id="feedbackBox"></div>
-            <div class="next-btn-wrap">
-                <button class="btn" id="nextBtn" onclick="nextQuestion()" disabled>
-                    Далее <span class="arrow">→</span>
+            <div class="hub-cards">
+                <button class="hub-card" data-goto="game">
+                    <span class="hub-card-icon">🎮</span>
+                    <div class="hub-card-title">Начать квест</div>
+                    <div class="hub-card-desc">6 вопросов о процессуальных решениях. Проверьте себя.</div>
+                </button>
+                <button class="hub-card" data-goto="calc">
+                    <span class="hub-card-icon">⏱</span>
+                    <div class="hub-card-title">Калькулятор сроков</div>
+                    <div class="hub-card-desc">Посчитайте любой процессуальный срок по УПК РФ с учётом продлений.</div>
+                </button>
+                <button class="hub-card" data-goto="ref">
+                    <span class="hub-card-icon">📋</span>
+                    <div class="hub-card-title">Справочник сроков</div>
+                    <div class="hub-card-desc">Все ключевые сроки, статьи и правила продления в одном месте.</div>
+                </button>
+                <button class="hub-card" data-goto="files">
+                    <span class="hub-card-icon">📚</span>
+                    <div class="hub-card-title">Библиотека</div>
+                    <div class="hub-card-desc">9 учебных материалов: УПК, УК, СМЭ, справочники следователя.</div>
                 </button>
             </div>
-            <div class="progress-container">
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progressFill"></div>
-                </div>
-                <div class="progress-text" id="progressText">0%</div>
-            </div>
-        </div>
+        </section>
 
-        <!-- Экран результата -->
-        <div id="screen-result" class="screen result-screen">
-            <div class="result-emblem" id="resultEmblem">🏆</div>
-            <div class="new-record" id="newRecord">✨ Новый рекорд!</div>
-            <h2>Дело закрыто</h2>
-            <div class="result-score" id="finalScore">0</div>
-            <div class="result-score-max" id="finalScoreMax">из 60 возможных</div>
-            <div class="result-verdict" id="finalVerdict"></div>
-            <div class="result-stats">
-                <div class="result-stat">
-                    <div class="result-stat-label">Верно</div>
-                    <div class="result-stat-value green" id="statCorrect">0</div>
-                </div>
-                <div class="result-stat">
-                    <div class="result-stat-label">Ошибок</div>
-                    <div class="result-stat-value red" id="statWrong">0</div>
-                </div>
-                <div class="result-stat">
-                    <div class="result-stat-label">Точность</div>
-                    <div class="result-stat-value" id="statAccuracy">0%</div>
+        <!-- ===== GAME ===== -->
+        <section class="section" id="section-game">
+            <!-- Start -->
+            <div class="game-screen active" id="gs-start">
+                <div class="start-screen">
+                    <div class="start-emblem">⚖️</div>
+                    <h2>Интерактивный квест</h2>
+                    <p>Вы — следователь Следственного комитета. Раскройте дело о разбойном нападении, принимая процессуальные решения на основе УК и УПК РФ.</p>
+                    <p>За правильный ответ — <span style="color:var(--gold-light);font-weight:600">+10 очков</span>, за ошибку — <span style="color:var(--gold-light);font-weight:600">−5 очков</span>.</p>
+                    <div class="start-stats">
+                        <div class="start-stat"><span class="start-stat-label">Вопросов</span><span class="start-stat-value">6</span></div>
+                        <div class="start-stat"><span class="start-stat-label">Максимум</span><span class="start-stat-value">60</span></div>
+                        <div class="start-stat"><span class="start-stat-label">Рекорд</span><span class="start-stat-value" id="bestScoreStart">—</span></div>
+                    </div>
+                    <button class="btn" onclick="startGame()">Начать расследование <span class="arrow">→</span></button>
                 </div>
             </div>
-            <button class="btn" onclick="restartGame()">
-                Пройти заново
-                <span class="arrow">↻</span>
-            </button>
-        </div>
-    </div>
 
-    <div class="footer">
-        УК РФ и УПК РФ — основа игры. Все совпадения с реальными делами случайны.
-    </div>
+            <!-- Question -->
+            <div class="game-screen" id="gs-question">
+                <div class="q-topbar">
+                    <div class="category-badge" id="categoryBadge">📁</div>
+                    <div class="question-counter"><span class="current" id="qCurrent">1</span> / <span id="qTotal">6</span></div>
+                </div>
+                <div class="scenario-box" id="scenarioText"></div>
+                <div class="question-text" id="questionText"></div>
+                <div class="options" id="optionsContainer"></div>
+                <div class="feedback" id="feedbackBox"></div>
+                <div class="next-btn-wrap">
+                    <button class="btn" id="nextBtn" onclick="nextQuestion()" disabled>Далее <span class="arrow">→</span></button>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+                    <div class="progress-text" id="progressText">0%</div>
+                </div>
+            </div>
+
+            <!-- Result -->
+            <div class="game-screen" id="gs-result">
+                <div class="result-screen">
+                    <div class="result-emblem" id="resultEmblem">🏆</div>
+                    <div class="new-record" id="newRecord">✨ Новый рекорд!</div>
+                    <h2>Дело закрыто</h2>
+                    <div class="result-score" id="finalScore">0</div>
+                    <div class="result-score-max" id="finalScoreMax">из 60 возможных</div>
+                    <div class="result-verdict" id="finalVerdict"></div>
+                    <div class="result-stats">
+                        <div class="result-stat"><div class="result-stat-label">Верно</div><div class="result-stat-value green" id="statCorrect">0</div></div>
+                        <div class="result-stat"><div class="result-stat-label">Ошибок</div><div class="result-stat-value red" id="statWrong">0</div></div>
+                        <div class="result-stat"><div class="result-stat-label">Точность</div><div class="result-stat-value" id="statAccuracy">0%</div></div>
+                    </div>
+                    <button class="btn" onclick="restartGame()">Пройти заново <span class="arrow">↻</span></button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== CALCULATOR ===== -->
+        <section class="section" id="section-calc">
+            <h2 class="section-title">⏱ Калькулятор процессуальных сроков</h2>
+            <p class="section-desc">Выберите тип срока и дату начала — увидите дату истечения с учётом ст. 128 УПК РФ и всех вариантов продления.</p>
+
+            <div class="calc-form">
+                <div class="calc-row">
+                    <div class="field">
+                        <label class="field-label" for="calcStartDate">Дата начала срока</label>
+                        <input type="date" id="calcStartDate">
+                    </div>
+                    <div class="field">
+                        <label class="field-label" for="calcType">Тип срока</label>
+                        <select id="calcType"></select>
+                    </div>
+                </div>
+                <div class="calc-actions">
+                    <button class="btn" onclick="calculateDeadline()">Рассчитать <span class="arrow">→</span></button>
+                    <button class="btn btn-secondary" onclick="setToday()">Сегодня</button>
+                </div>
+            </div>
+
+            <div id="calcResultContainer">
+                <div class="calc-result-empty">Выберите тип срока и дату, чтобы увидеть результат</div>
+            </div>
+
+            <div class="calc-note">
+                <strong>📌 Как считается:</strong> сроки в сутках истекают в 24:00 последнего дня (ч. 2 ст. 128 УПК РФ); сроки в месяцах — в соответствующее число последнего месяца (ч. 2 ст. 128 УПК РФ); срок задержания (48 ч) исчисляется в часах с момента фактического задержания. В расчёте по месяцам и суткам день начала не учитывается согласно ч. 1 ст. 128 УПК РФ.
+            </div>
+        </section>
+
+        <!-- ===== REFERENCE ===== -->
+        <section class="section" id="section-ref">
+            <h2 class="section-title">📋 Справочник процессуальных сроков</h2>
+            <p class="section-desc">Ключевые сроки досудебного производства по УПК РФ с основаниями продления.</p>
+
+            <div class="ref-grid" id="refGrid"></div>
+        </section>
+
+        <!-- ===== FILES ===== -->
+        <section class="section" id="section-files">
+            <h2 class="section-title">📚 Библиотека учебных материалов</h2>
+            <p class="section-desc">Все загруженные файлы: кодексы, справочники следователя, учебные пособия по СМЭ и криминалистике.</p>
+
+            <div class="files-grid" id="filesGrid"></div>
+
+            <div class="files-note">
+                <strong>⚠️ Как открыть файлы:</strong> положите этот <code>index.html</code> и все 9 файлов в одну папку. Ссылки откроют PDF/DOCX в браузере или скачают их.
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        УК РФ и УПК РФ — основа проекта. Все совпадения с реальными делами случайны.
+    </footer>
 </div>
 
 <script>
-    // Данные игры
-    const questions = [
-        {
-            category: "Возбуждение дела",
-            scenario: "В дежурную часть поступило сообщение о разбойном нападении на ювелирный магазин. Неизвестный, угрожая пистолетом, разбил витрину и похитил золотые украшения на сумму 1 500 000 рублей. Продавец не пострадала.",
-            question: "Какое решение должен принять следователь?",
-            options: [
-                { text: "Возбудить уголовное дело по ст. 162 УК РФ (разбой)", correct: true },
-                { text: "Отказать в возбуждении, так как нет заявления потерпевшего", correct: false },
-                { text: "Возбудить уголовное дело по ст. 158 УК РФ (кража)", correct: false }
-            ],
-            explanation: "Разбой (ст. 162 УК РФ) — публичное обвинение. Дело возбуждается по сообщению о преступлении, независимо от заявления потерпевшего. Квалификация по ст. 158 неверна, так как было применено насилие (угроза пистолетом).",
-            law: "УК РФ, ст. 162; УПК РФ, ст. 140, 146"
-        },
-        {
-            category: "Осмотр места",
-            scenario: "Вы возбудили уголовное дело. На месте происшествия обнаружены следы обуви, осколки витрины, гильза от пистолета. Продавец даёт показания.",
-            question: "Какое следственное действие необходимо провести в первую очередь для фиксации следов?",
-            options: [
-                { text: "Осмотр места происшествия", correct: true },
-                { text: "Допрос подозреваемого", correct: false },
-                { text: "Обыск в квартире вероятного подозреваемого", correct: false }
-            ],
-            explanation: "Осмотр места происшествия — неотложное следственное действие, направленное на обнаружение и фиксацию следов преступления (ст. 176, 177 УПК РФ). Подозреваемого ещё нет, а обыск требует оснований.",
-            law: "УПК РФ, ст. 176, 177"
-        },
-        {
-            category: "Задержание",
-            scenario: "В ходе оперативно-розыскных мероприятий задержан гражданин К., подозреваемый в совершении разбоя. Он был застигнут при попытке сбыть похищенные украшения.",
-            question: "Какой максимальный срок задержания подозреваемого без судебного решения допускается по УПК РФ?",
-            options: [
-                { text: "48 часов", correct: true },
-                { text: "72 часа", correct: false },
-                { text: "24 часа", correct: false }
-            ],
-            explanation: "Согласно ст. 10 и ст. 94 УПК РФ, до судебного решения лицо не может быть подвергнуто задержанию на срок более 48 часов. По истечении этого срока оно подлежит освобождению, если суд не избрал меру пресечения.",
-            law: "УПК РФ, ст. 10, 94"
-        },
-        {
-            category: "Мера пресечения",
-            scenario: "Вы располагаете достаточными основаниями полагать, что подозреваемый К. может скрыться. Необходимо избрать меру пресечения в виде заключения под стражу.",
-            question: "Кто уполномочен принять решение о заключении под стражу?",
-            options: [
-                { text: "Суд (судья районного суда)", correct: true },
-                { text: "Следователь с согласия руководителя следственного органа", correct: false },
-                { text: "Прокурор", correct: false }
-            ],
-            explanation: "Заключение под стражу — исключительная мера пресечения, применяемая только по судебному решению (ст. 108 УПК РФ). Следователь возбуждает ходатайство, но решение принимает суд.",
-            law: "УПК РФ, ст. 108"
-        },
-        {
-            category: "Квалификация",
-            scenario: "Подозреваемый К. сознался в содеянном и сообщил, что пистолет, которым он угрожал, является газовым, но он использовал его как предмет, имитирующий оружие. Украшения он планировал продать.",
-            question: "Как квалифицировать действия К. с учётом показаний и обстоятельств дела?",
-            options: [
-                { text: "Ч. 2 ст. 162 УК РФ — разбой с применением предметов, используемых в качестве оружия", correct: true },
-                { text: "Ч. 1 ст. 162 УК РФ — разбой без квалифицирующих признаков", correct: false },
-                { text: "Ст. 111 УК РФ — умышленное причинение тяжкого вреда здоровью", correct: false }
-            ],
-            explanation: "Использование газового пистолета (предмета, используемого в качестве оружия) при разбойном нападении образует квалифицированный состав по ч. 2 ст. 162 УК РФ. Вреда здоровью не причинено, поэтому ст. 111 неприменима.",
-            law: "УК РФ, ст. 162, ч. 2"
-        },
-        {
-            category: "Права защиты",
-            scenario: "При задержании К. заявил, что желает воспользоваться помощью защитника, но не может его пригласить, так как не имеет средств.",
-            question: "Какое право имеет подозреваемый в данном случае?",
-            options: [
-                { text: "Право на бесплатную помощь защитника, предоставляемого государством", correct: true },
-                { text: "Право отказаться от защитника и защищаться самостоятельно", correct: false },
-                { text: "Право на один телефонный звонок", correct: false }
-            ],
-            explanation: "Подозреваемый имеет право на защитника, в том числе бесплатно, в случаях, предусмотренных законом (ст. 16, 46, 49, 51 УПК РФ). Следователь обязан обеспечить участие защитника, если подозреваемый не может его пригласить.",
-            law: "УПК РФ, ст. 16, 46, 49, 51"
-        }
-    ];
+/* ============================================================
+   DATA
+   ============================================================ */
 
-    // Состояние игры
-    const state = {
-        currentQuestionIndex: 0,
-        score: 0,
-        streak: 0,
-        answered: false,
-        correctCount: 0,
-        wrongCount: 0,
-        bestScore: parseInt(localStorage.getItem('investigator_best_score') || '0', 10) || 0
-    };
-
-    // DOM элементы
-    const $ = id => document.getElementById(id);
-    const scoreDisplay = $('scoreDisplay');
-    const scoreBox = $('scoreBox');
-    const streakBadge = $('streakBadge');
-    const streakCount = $('streakCount');
-    const restartBtn = $('restartBtn');
-    const screenStart = $('screen-start');
-    const screenQuestion = $('screen-question');
-    const screenResult = $('screen-result');
-    const categoryBadge = $('categoryBadge');
-    const qCurrent = $('qCurrent');
-    const qTotal = $('qTotal');
-    const scenarioText = $('scenarioText');
-    const questionText = $('questionText');
-    const optionsContainer = $('optionsContainer');
-    const feedbackBox = $('feedbackBox');
-    const nextBtn = $('nextBtn');
-    const progressFill = $('progressFill');
-    const progressText = $('progressText');
-    const finalScore = $('finalScore');
-    const finalScoreMax = $('finalScoreMax');
-    const finalVerdict = $('finalVerdict');
-    const resultEmblem = $('resultEmblem');
-    const newRecord = $('newRecord');
-    const statCorrect = $('statCorrect');
-    const statWrong = $('statWrong');
-    const statAccuracy = $('statAccuracy');
-    const bestScoreStart = $('bestScoreStart');
-
-    // Инициализация
-    function init() {
-        if (state.bestScore > 0) {
-            bestScoreStart.textContent = state.bestScore;
-        }
-        qTotal.textContent = questions.length;
+const questions = [
+    {
+        category: "Возбуждение дела",
+        scenario: "В дежурную часть поступило сообщение о разбойном нападении на ювелирный магазин. Неизвестный, угрожая пистолетом, разбил витрину и похитил золотые украшения на сумму 1 500 000 рублей. Продавец не пострадала.",
+        question: "Какое решение должен принять следователь?",
+        options: [
+            { text: "Возбудить уголовное дело по ст. 162 УК РФ (разбой)", correct: true },
+            { text: "Отказать в возбуждении, так как нет заявления потерпевшего", correct: false },
+            { text: "Возбудить уголовное дело по ст. 158 УК РФ (кража)", correct: false }
+        ],
+        explanation: "Разбой (ст. 162 УК РФ) — публичное обвинение. Дело возбуждается по сообщению о преступлении, независимо от заявления потерпевшего. Квалификация по ст. 158 неверна, так как было применено насилие (угроза пистолетом).",
+        law: "УК РФ, ст. 162; УПК РФ, ст. 140, 146"
+    },
+    {
+        category: "Осмотр места",
+        scenario: "Вы возбудили уголовное дело. На месте происшествия обнаружены следы обуви, осколки витрины, гильза от пистолета. Продавец даёт показания.",
+        question: "Какое следственное действие необходимо провести в первую очередь для фиксации следов?",
+        options: [
+            { text: "Осмотр места происшествия", correct: true },
+            { text: "Допрос подозреваемого", correct: false },
+            { text: "Обыск в квартире вероятного подозреваемого", correct: false }
+        ],
+        explanation: "Осмотр места происшествия — неотложное следственное действие, направленное на обнаружение и фиксацию следов преступления (ст. 176, 177 УПК РФ). Подозреваемого ещё нет, а обыск требует оснований.",
+        law: "УПК РФ, ст. 176, 177"
+    },
+    {
+        category: "Задержание",
+        scenario: "В ходе оперативно-розыскных мероприятий задержан гражданин К., подозреваемый в совершении разбоя. Он был застигнут при попытке сбыть похищенные украшения.",
+        question: "Какой максимальный срок задержания подозреваемого без судебного решения допускается по УПК РФ?",
+        options: [
+            { text: "48 часов", correct: true },
+            { text: "72 часа", correct: false },
+            { text: "24 часа", correct: false }
+        ],
+        explanation: "Согласно ст. 10 и ст. 94 УПК РФ, до судебного решения лицо не может быть подвергнуто задержанию на срок более 48 часов. По истечении этого срока оно подлежит освобождению, если суд не избрал меру пресечения.",
+        law: "УПК РФ, ст. 10, 94"
+    },
+    {
+        category: "Мера пресечения",
+        scenario: "Вы располагаете достаточными основаниями полагать, что подозреваемый К. может скрыться. Необходимо избрать меру пресечения в виде заключения под стражу.",
+        question: "Кто уполномочен принять решение о заключении под стражу?",
+        options: [
+            { text: "Суд (судья районного суда)", correct: true },
+            { text: "Следователь с согласия руководителя следственного органа", correct: false },
+            { text: "Прокурор", correct: false }
+        ],
+        explanation: "Заключение под стражу — исключительная мера пресечения, применяемая только по судебному решению (ст. 108 УПК РФ). Следователь возбуждает ходатайство, но решение принимает суд.",
+        law: "УПК РФ, ст. 108"
+    },
+    {
+        category: "Квалификация",
+        scenario: "Подозреваемый К. сознался в содеянном и сообщил, что пистолет, которым он угрожал, является газовым, но он использовал его как предмет, имитирующий оружие. Украшения он планировал продать.",
+        question: "Как квалифицировать действия К. с учётом показаний и обстоятельств дела?",
+        options: [
+            { text: "Ч. 2 ст. 162 УК РФ — разбой с применением предметов, используемых в качестве оружия", correct: true },
+            { text: "Ч. 1 ст. 162 УК РФ — разбой без квалифицирующих признаков", correct: false },
+            { text: "Ст. 111 УК РФ — умышленное причинение тяжкого вреда здоровью", correct: false }
+        ],
+        explanation: "Использование газового пистолета (предмета, используемого в качестве оружия) при разбойном нападении образует квалифицированный состав по ч. 2 ст. 162 УК РФ. Вреда здоровью не причинено, поэтому ст. 111 неприменима.",
+        law: "УК РФ, ст. 162, ч. 2"
+    },
+    {
+        category: "Права защиты",
+        scenario: "При задержании К. заявил, что желает воспользоваться помощью защитника, но не может его пригласить, так как не имеет средств.",
+        question: "Какое право имеет подозреваемый в данном случае?",
+        options: [
+            { text: "Право на бесплатную помощь защитника, предоставляемого государством", correct: true },
+            { text: "Право отказаться от защитника и защищаться самостоятельно", correct: false },
+            { text: "Право на один телефонный звонок", correct: false }
+        ],
+        explanation: "Подозреваемый имеет право на защитника, в том числе бесплатно, в случаях, предусмотренных законом (ст. 16, 46, 49, 51 УПК РФ). Следователь обязан обеспечить участие защитника, если подозреваемый не может его пригласить.",
+        law: "УПК РФ, ст. 16, 46, 49, 51"
     }
+];
 
-    function showScreen(screen) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        screen.classList.add('active');
+// Deadlines data
+const deadlines = [
+    {
+        id: 'check_3',
+        category: 'Возбуждение уголовного дела',
+        label: 'Проверка сообщения о преступлении — 3 суток',
+        article: 'ч. 1 ст. 144 УПК РФ',
+        base: { value: 3, unit: 'days' },
+        desc: 'Срок предварительной проверки сообщения о преступлении со дня его поступления.',
+        extensions: [
+            { value: 10, unit: 'days', label: 'До 10 суток', by: 'Руководитель СО / начальник органа дознания (по ходатайству следователя/дознавателя)' },
+            { value: 30, unit: 'days', label: 'До 30 суток', by: 'Руководитель СО / прокурор (при необходимости документальных проверок или ревизий)' }
+        ]
+    },
+    {
+        id: 'investigation',
+        category: 'Предварительное расследование',
+        label: 'Предварительное следствие — 2 месяца',
+        article: 'ч. 1 ст. 162 УПК РФ',
+        base: { value: 2, unit: 'months' },
+        desc: 'Срок предварительного следствия со дня возбуждения уголовного дела до направления прокурору с обвинительным заключением.',
+        extensions: [
+            { value: 3, unit: 'months', label: 'До 3 месяцев', by: 'Руководитель следственного органа' },
+            { value: 12, unit: 'months', label: 'До 12 месяцев', by: 'Руководитель СО по субъекту РФ (при особой сложности)' },
+            { value: null, unit: 'months', label: 'Свыше 12 месяцев', by: 'Председатель СК РФ или руководитель СО федерального органа (исключительные случаи)' }
+        ]
+    },
+    {
+        id: 'inquiry',
+        category: 'Предварительное расследование',
+        label: 'Дознание в общем порядке — 30 суток',
+        article: 'ч. 3 ст. 223 УПК РФ',
+        base: { value: 30, unit: 'days' },
+        desc: 'Срок дознания со дня возбуждения уголовного дела до составления обвинительного акта.',
+        extensions: [
+            { value: 6, unit: 'months', label: 'До 6 месяцев', by: 'Прокурор города / района (в необходимых случаях, в т.ч. при экспертизе)' },
+            { value: 12, unit: 'months', label: 'До 12 месяцев', by: 'Прокурор субъекта РФ (исключительные случаи, связанные с запросом о правовой помощи)' }
+        ]
+    },
+    {
+        id: 'inquiry_short',
+        category: 'Предварительное расследование',
+        label: 'Дознание в сокращенной форме — 15 суток',
+        article: 'ч. 1 ст. 226.6 УПК РФ',
+        base: { value: 15, unit: 'days' },
+        desc: 'Срок дознания в сокращенной форме со дня вынесения постановления о производстве дознания в сокращенной форме.',
+        extensions: [
+            { value: 20, unit: 'days', label: 'До 20 суток', by: 'Прокурор (при ходатайстве обвиняемого/защитника после ознакомления с обвинительным постановлением)' }
+        ]
+    },
+    {
+        id: 'detention',
+        category: 'Меры процессуального принуждения',
+        label: 'Задержание подозреваемого — 48 часов',
+        article: 'ст. 10, 94 УПК РФ',
+        base: { value: 48, unit: 'hours' },
+        desc: 'Максимальный срок задержания без судебного решения, исчисляется с момента фактического задержания.',
+        extensions: [
+            { value: null, unit: 'hours', label: 'Продление', by: 'Только по судебному решению (заключение под стражу)' }
+        ]
+    },
+    {
+        id: 'custody',
+        category: 'Меры процессуального принуждения',
+        label: 'Содержание под стражей — 2 месяца',
+        article: 'ч. 1 ст. 109 УПК РФ',
+        base: { value: 2, unit: 'months' },
+        desc: 'Срок содержания под стражей по судебному решению.',
+        extensions: [
+            { value: 6, unit: 'months', label: 'До 6 месяцев', by: 'Судья районного суда' },
+            { value: 12, unit: 'months', label: 'До 12 месяцев', by: 'Судья районного суда (по тяжким и особо тяжким)' },
+            { value: 18, unit: 'months', label: 'До 18 месяцев', by: 'Судья областного суда (исключительные случаи, особо тяжкие)' }
+        ]
+    },
+    {
+        id: 'accusation',
+        category: 'Привлечение в качестве обвиняемого',
+        label: 'Предъявление обвинения — 3 суток',
+        article: 'ч. 1 ст. 172 УПК РФ',
+        base: { value: 3, unit: 'days' },
+        desc: 'Срок предъявления обвинения с момента вынесения постановления о привлечении в качестве обвиняемого (в присутствии защитника, если он участвует).',
+        extensions: []
+    },
+    {
+        id: 'accusation_detained',
+        category: 'Привлечение в качестве обвиняемого',
+        label: 'Обвинение после задержания — 10 суток',
+        article: 'ст. 100 УПК РФ',
+        base: { value: 10, unit: 'days' },
+        desc: 'Срок предъявления обвинения с момента задержания или применения меры пресечения до предъявления обвинения.',
+        extensions: [
+            { value: null, unit: 'days', label: 'Продление', by: 'Только по судебному решению (по делам о терроризме и др.)' }
+        ]
+    },
+    {
+        id: 'prosecutor_indictment',
+        category: 'Окончание расследования',
+        label: 'Прокурор по обвинительному заключению — 10 суток',
+        article: 'ч. 1 ст. 221 УПК РФ',
+        base: { value: 10, unit: 'days' },
+        desc: 'Срок принятия прокурором решения по поступившему уголовному делу с обвинительным заключением.',
+        extensions: [
+            { value: 30, unit: 'days', label: 'До 30 суток', by: 'Прокурор (в случае особой сложности или большого объёма дела)' }
+        ]
+    },
+    {
+        id: 'prosecutor_act',
+        category: 'Окончание расследования',
+        label: 'Прокурор по обвинительному акту — 2 суток',
+        article: 'ч. 1 ст. 226 УПК РФ',
+        base: { value: 2, unit: 'days' },
+        desc: 'Срок принятия прокурором решения по уголовному делу, поступившему с обвинительным актом (дознание в общем порядке).',
+        extensions: []
+    },
+    {
+        id: 'prosecutor_short',
+        category: 'Окончание расследования',
+        label: 'Прокурор по обвинительному постановлению — 3 суток',
+        article: 'ч. 1 ст. 226.8 УПК РФ',
+        base: { value: 3, unit: 'days' },
+        desc: 'Срок принятия прокурором решения по уголовному делу, расследованному в сокращенной форме дознания.',
+        extensions: []
     }
+];
 
-    function startGame() {
-        state.currentQuestionIndex = 0;
-        state.score = 0;
-        state.streak = 0;
-        state.answered = false;
-        state.correctCount = 0;
-        state.wrongCount = 0;
-        scoreDisplay.textContent = '0';
-        streakBadge.classList.remove('visible');
-        restartBtn.style.display = 'flex';
-        showScreen(screenQuestion);
-        loadQuestion();
+// Files
+const files = [
+    { name: 'dosudebnoe_proizvodstvo_po_ud.pdf', title: 'Досудебное производство по уголовным делам', desc: 'Учебное пособие И.С. Лапаева (ПГУ, 2020). Возбуждение дела, предварительное расследование, следственные действия, привлечение в качестве обвиняемого, окончание расследования.', icon: '📕', type: 'PDF · Учебник', size: '158 с.' },
+    { name: 'uchebnoe_ugolovnoe_delo.pdf', title: 'Уголовное дело № 201285 (учебно-практическое пособие)', desc: 'А.Г. Вениаминов. Пошаговый пример расследования: от заявления до обвинительного заключения. Все этапы работы следователя.', icon: '📘', type: 'PDF · Учебное дело', size: 'Москва, 2019' },
+    { name: 'tipografika_dlya_yuristov.pdf', title: 'Типографика и орфография для юристов', desc: 'Неразрывные пробелы, тире, кавычки, форматы чисел и дат, оформление документов. Практическое руководство по «юридическому» набору текста.', icon: '✒️', type: 'PDF · Методичка', size: '5 с.' },
+    { name: 'spravochnik_sledovatelya.pdf', title: 'Справочник следователя', desc: 'А.Л. Мишуточкин (СибАГС, 2017). Осмотр объектов, следов, оружия, документов. Справочные материалы по оружию, ТС, зданиям, мебели, человеку.', icon: '🔍', type: 'PDF · Справочник', size: '251 с.' },
+    { name: 'spravochnik_kremlev_sk.docx', title: 'Методичка для следователей СК РФ', desc: 'Общие основы уголовного права, участники процесса, получение сообщения, ОМП, осмотр места убийства, обыск, проверка показаний, очная ставка, опознание.', icon: '📄', type: 'DOCX · Методичка', size: 'Следственный комитет' },
+    { name: 'sostavy_statey_uk.pdf', title: 'Составы статей УК РФ', desc: 'Разбор объективных и субъективных признаков составов: убийство, вред здоровью, половые преступления, кража, разбой, терроризм, наркотики, должностные.', icon: '⚖️', type: 'PDF · Справочник', size: 'УК РФ' },
+    { name: 'sme_zhivykh_lits.pdf', title: 'Судебно-медицинская экспертиза живых лиц', desc: 'В.И. Витер, А.Ю. Вавилов (Ижевск, 2008). Определение степени тяжести вреда здоровью, половые преступления, развратные действия, беременность, роды.', icon: '🩺', type: 'PDF · Учебное пособие', size: '76 с.' },
+    { name: 'rukovodstvo_dlya_sledovatelya.pdf', title: 'Руководство для следователя и его помощника', desc: 'Под ред. Ю.П. Гармаева (Юрлитинформ, 2009). Работа с общественным помощником, систематизация дела, осмотр, обыск, допросы, опознание, обвинительное заключение.', icon: '📗', type: 'PDF · Руководство', size: '208 с.' }
+];
+
+/* ============================================================
+   NAVIGATION
+   ============================================================ */
+
+const navButtons = document.querySelectorAll('.nav-btn');
+const sections = document.querySelectorAll('.section');
+
+function switchSection(sectionId) {
+    navButtons.forEach(b => b.classList.toggle('active', b.dataset.section === sectionId));
+    sections.forEach(s => s.classList.toggle('active', s.id === 'section-' + sectionId));
+    // Reset game section view if navigating there
+    if (sectionId === 'game' && !gameState.started) {
+        showGameScreen('gs-start');
     }
+}
 
-    function loadQuestion() {
-        state.answered = false;
-        nextBtn.disabled = true;
-        feedbackBox.className = 'feedback';
-        feedbackBox.innerHTML = '';
+navButtons.forEach(btn => {
+    btn.addEventListener('click', () => switchSection(btn.dataset.section));
+});
 
-        const q = questions[state.currentQuestionIndex];
-        categoryBadge.textContent = '📁 ' + q.category;
-        scenarioText.textContent = q.scenario;
-        questionText.textContent = q.question;
+document.querySelectorAll('[data-goto]').forEach(el => {
+    el.addEventListener('click', () => switchSection(el.dataset.goto));
+});
 
-        optionsContainer.innerHTML = '';
-        q.options.forEach((opt, index) => {
-            const btn = document.createElement('button');
-            btn.className = 'option';
-            btn.innerHTML = `
-                <span class="letter">${String.fromCharCode(65 + index)}</span>
-                <span class="opt-text">${opt.text}</span>
-                <span class="check-icon"></span>
-            `;
-            btn.onclick = () => selectOption(index, btn);
-            optionsContainer.appendChild(btn);
-        });
+/* ============================================================
+   GAME
+   ============================================================ */
 
-        qCurrent.textContent = state.currentQuestionIndex + 1;
-        const progress = (state.currentQuestionIndex / questions.length) * 100;
-        progressFill.style.width = progress + '%';
-        progressText.textContent = Math.round(progress) + '%';
-    }
+const gameState = {
+    currentQuestionIndex: 0,
+    score: 0,
+    streak: 0,
+    answered: false,
+    correctCount: 0,
+    wrongCount: 0,
+    started: false,
+    bestScore: parseInt(localStorage.getItem('investigator_best_score') || '0', 10) || 0
+};
 
-    function selectOption(index, btn) {
-        if (state.answered) return;
-        state.answered = true;
+const $ = id => document.getElementById(id);
+const scoreDisplay = $('scoreDisplay');
+const scoreBox = $('scoreBox');
+const streakBadge = $('streakBadge');
+const streakCount = $('streakCount');
 
-        const q = questions[state.currentQuestionIndex];
-        const isCorrect = q.options[index].correct;
-        const allOptions = document.querySelectorAll('.option');
+function showGameScreen(id) {
+    document.querySelectorAll('.game-screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+}
 
-        allOptions.forEach(opt => {
-            opt.classList.add('disabled');
-            opt.onclick = null;
-        });
+function updateBestScoreUI() {
+    const bestVal = gameState.bestScore || '—';
+    const el1 = $('bestScoreStart');
+    const el2 = $('bestScoreValue');
+    if (el1) el1.textContent = bestVal;
+    if (el2) el2.textContent = bestVal;
+}
 
-        if (isCorrect) {
-            btn.classList.add('selected-correct');
-            btn.querySelector('.check-icon').textContent = '✓';
-            state.score += 10;
-            state.correctCount++;
-            state.streak++;
-            createConfetti();
-        } else {
-            btn.classList.add('selected-wrong');
-            btn.querySelector('.check-icon').textContent = '✗';
-            state.score -= 5;
-            state.wrongCount++;
-            state.streak = 0;
-            const correctIndex = q.options.findIndex(o => o.correct);
-            if (correctIndex >= 0 && allOptions[correctIndex]) {
-                allOptions[correctIndex].classList.add('selected-correct');
-                allOptions[correctIndex].querySelector('.check-icon').textContent = '✓';
-            }
-        }
+function startGame() {
+    gameState.currentQuestionIndex = 0;
+    gameState.score = 0;
+    gameState.streak = 0;
+    gameState.answered = false;
+    gameState.correctCount = 0;
+    gameState.wrongCount = 0;
+    gameState.started = true;
+    scoreDisplay.textContent = '0';
+    streakBadge.classList.remove('visible');
+    showGameScreen('gs-question');
+    loadQuestion();
+}
 
-        updateScore();
-        updateStreak();
+function loadQuestion() {
+    gameState.answered = false;
+    $('nextBtn').disabled = true;
+    $('feedbackBox').className = 'feedback';
+    $('feedbackBox').innerHTML = '';
 
-        feedbackBox.className = 'feedback ' + (isCorrect ? 'correct' : 'wrong');
-        feedbackBox.innerHTML = `
-            <div class="feedback-title">${isCorrect ? '✅ Верно!' : '❌ Неверно'}</div>
-            <div>${q.explanation}</div>
-            <span class="law-ref">⚖ ${q.law}</span>
-        `;
+    const q = questions[gameState.currentQuestionIndex];
+    $('categoryBadge').textContent = '📁 ' + q.category;
+    $('scenarioText').textContent = q.scenario;
+    $('questionText').textContent = q.question;
 
-        nextBtn.disabled = false;
-
-        if (state.currentQuestionIndex === questions.length - 1) {
-            nextBtn.innerHTML = 'Результаты <span class="arrow">→</span>';
-        }
-    }
-
-    function updateScore() {
-        const newScore = state.score;
-        scoreBox.classList.remove('pulse');
-        void scoreBox.offsetWidth;
-        scoreBox.classList.add('pulse');
-        animateValue(scoreDisplay, newScore);
-    }
-
-    function animateValue(element, target) {
-        const from = parseInt(element.textContent, 10) || 0;
-        const duration = 500;
-        const start = performance.now();
-        function step(now) {
-            const t = Math.min((now - start) / duration, 1);
-            const eased = 1 - Math.pow(1 - t, 3);
-            element.textContent = Math.round(from + (target - from) * eased);
-            if (t < 1) requestAnimationFrame(step);
-        }
-        requestAnimationFrame(step);
-    }
-
-    function updateStreak() {
-        if (state.streak >= 2) {
-            streakCount.textContent = state.streak;
-            streakBadge.classList.add('visible');
-        } else {
-            streakBadge.classList.remove('visible');
-        }
-    }
-
-    function nextQuestion() {
-        state.currentQuestionIndex++;
-        if (state.currentQuestionIndex < questions.length) {
-            loadQuestion();
-        } else {
-            endGame();
-        }
-    }
-
-    function endGame() {
-        showScreen(screenResult);
-        restartBtn.style.display = 'none';
-        streakBadge.classList.remove('visible');
-
-        const totalPossible = questions.length * 10;
-        finalScoreMax.textContent = 'из ' + totalPossible + ' возможных';
-        statCorrect.textContent = state.correctCount;
-        statWrong.textContent = state.wrongCount;
-        const accuracy = Math.round((state.correctCount / questions.length) * 100);
-        statAccuracy.textContent = accuracy + '%';
-
-        // Анимированное появление счёта
-        finalScore.textContent = '0';
-        animateValue(finalScore, state.score);
-
-        // Рекорд
-        if (state.score > state.bestScore) {
-            state.bestScore = state.score;
-            localStorage.setItem('investigator_best_score', state.bestScore);
-            newRecord.classList.add('visible');
-            bestScoreStart.textContent = state.bestScore;
-        } else {
-            newRecord.classList.remove('visible');
-        }
-
-        let verdict = '';
-        let emblem = '📚';
-        if (state.score >= 50) {
-            verdict = '🏆 Отличная работа! Вы — профессионал своего дела. Дело передано в суд.';
-            emblem = '🏆';
-        } else if (state.score >= 30) {
-            verdict = '👍 Хороший результат! Вы допустили небольшие ошибки, но дело раскрыто.';
-            emblem = '🥈';
-        } else if (state.score >= 10) {
-            verdict = '⚖️ Удовлетворительно. Стоит повторить УПК и УК РФ.';
-            emblem = '📖';
-        } else {
-            verdict = '📚 Вам нужно подтянуть знания кодексов. Попробуйте ещё раз!';
-            emblem = '📚';
-        }
-        finalVerdict.textContent = verdict;
-        resultEmblem.textContent = emblem;
-
-        if (state.score >= 50) createConfetti(60);
-    }
-
-    function restartGame() {
-        startGame();
-    }
-
-    // Confetti эффект
-    function createConfetti(count = 30) {
-        const colors = ['#d4af37', '#f0d97d', '#4ade80', '#e8eaed', '#f87171'];
-        for (let i = 0; i < count; i++) {
-            const piece = document.createElement('div');
-            piece.className = 'confetti';
-            piece.style.left = Math.random() * 100 + 'vw';
-            piece.style.background = colors[Math.floor(Math.random() * colors.length)];
-            piece.style.animationDuration = (1.5 + Math.random() * 1.5) + 's';
-            piece.style.animationDelay = Math.random() * 0.3 + 's';
-            piece.style.width = (6 + Math.random() * 8) + 'px';
-            piece.style.height = (6 + Math.random() * 8) + 'px';
-            document.body.appendChild(piece);
-            setTimeout(() => piece.remove(), 3500);
-        }
-    }
-
-    // Рестарт из хедера
-    restartBtn.addEventListener('click', () => {
-        if (confirm('Начать заново? Текущий прогресс будет потерян.')) {
-            startGame();
-        }
+    const opts = $('optionsContainer');
+    opts.innerHTML = '';
+    q.options.forEach((opt, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'option';
+        btn.innerHTML = `<span class="letter">${String.fromCharCode(65 + i)}</span><span class="opt-text">${opt.text}</span><span class="check-icon"></span>`;
+        btn.onclick = () => selectOption(i, btn);
+        opts.appendChild(btn);
     });
 
-    // Инициализация
-    init();
+    $('qCurrent').textContent = gameState.currentQuestionIndex + 1;
+    const progress = (gameState.currentQuestionIndex / questions.length) * 100;
+    $('progressFill').style.width = progress + '%';
+    $('progressText').textContent = Math.round(progress) + '%';
+
+    const nextBtn = $('nextBtn');
+    nextBtn.innerHTML = gameState.currentQuestionIndex === questions.length - 1
+        ? 'Результаты <span class="arrow">→</span>'
+        : 'Далее <span class="arrow">→</span>';
+}
+
+function selectOption(index, btn) {
+    if (gameState.answered) return;
+    gameState.answered = true;
+
+    const q = questions[gameState.currentQuestionIndex];
+    const isCorrect = q.options[index].correct;
+    const allOptions = document.querySelectorAll('.option');
+
+    allOptions.forEach(o => { o.classList.add('disabled'); o.onclick = null; });
+
+    if (isCorrect) {
+        btn.classList.add('selected-correct');
+        btn.querySelector('.check-icon').textContent = '✓';
+        gameState.score += 10;
+        gameState.correctCount++;
+        gameState.streak++;
+        createConfetti();
+    } else {
+        btn.classList.add('selected-wrong');
+        btn.querySelector('.check-icon').textContent = '✗';
+        gameState.score -= 5;
+        gameState.wrongCount++;
+        gameState.streak = 0;
+        const ci = q.options.findIndex(o => o.correct);
+        if (ci >= 0 && allOptions[ci]) {
+            allOptions[ci].classList.add('selected-correct');
+            allOptions[ci].querySelector('.check-icon').textContent = '✓';
+        }
+    }
+
+    updateScoreUI();
+    updateStreakUI();
+
+    $('feedbackBox').className = 'feedback ' + (isCorrect ? 'correct' : 'wrong');
+    $('feedbackBox').innerHTML = `
+        <div class="feedback-title">${isCorrect ? '✅ Верно!' : '❌ Неверно'}</div>
+        <div>${q.explanation}</div>
+        <span class="law-ref">⚖ ${q.law}</span>
+    `;
+
+    $('nextBtn').disabled = false;
+}
+
+function updateScoreUI() {
+    scoreBox.classList.remove('pulse');
+    void scoreBox.offsetWidth;
+    scoreBox.classList.add('pulse');
+    animateValue(scoreDisplay, gameState.score);
+}
+
+function animateValue(el, target) {
+    const from = parseInt(el.textContent, 10) || 0;
+    const dur = 500;
+    const start = performance.now();
+    function step(now) {
+        const t = Math.min((now - start) / dur, 1);
+        const eased = 1 - Math.pow(1 - t, 3);
+        el.textContent = Math.round(from + (target - from) * eased);
+        if (t < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+}
+
+function updateStreakUI() {
+    if (gameState.streak >= 2) {
+        streakCount.textContent = gameState.streak;
+        streakBadge.classList.add('visible');
+    } else {
+        streakBadge.classList.remove('visible');
+    }
+}
+
+function nextQuestion() {
+    gameState.currentQuestionIndex++;
+    if (gameState.currentQuestionIndex < questions.length) {
+        loadQuestion();
+    } else {
+        endGame();
+    }
+}
+
+function endGame() {
+    showGameScreen('gs-result');
+    const totalPossible = questions.length * 10;
+    $('finalScoreMax').textContent = 'из ' + totalPossible + ' возможных';
+    $('statCorrect').textContent = gameState.correctCount;
+    $('statWrong').textContent = gameState.wrongCount;
+    const acc = Math.round((gameState.correctCount / questions.length) * 100);
+    $('statAccuracy').textContent = acc + '%';
+
+    $('finalScore').textContent = '0';
+    animateValue($('finalScore'), gameState.score);
+
+    if (gameState.score > gameState.bestScore) {
+        gameState.bestScore = gameState.score;
+        localStorage.setItem('investigator_best_score', gameState.bestScore);
+        $('newRecord').classList.add('visible');
+    } else {
+        $('newRecord').classList.remove('visible');
+    }
+    updateBestScoreUI();
+
+    let verdict = '', emblem = '📚';
+    if (gameState.score >= 50) { verdict = '🏆 Отличная работа! Вы — профессионал своего дела. Дело передано в суд.'; emblem = '🏆'; }
+    else if (gameState.score >= 30) { verdict = '👍 Хороший результат! Вы допустили небольшие ошибки, но дело раскрыто.'; emblem = '🥈'; }
+    else if (gameState.score >= 10) { verdict = '⚖️ Удовлетворительно. Стоит повторить УПК и УК РФ.'; emblem = '📖'; }
+    else { verdict = '📚 Вам нужно подтянуть знания кодексов. Попробуйте ещё раз!'; emblem = '📚'; }
+    $('finalVerdict').textContent = verdict;
+    $('resultEmblem').textContent = emblem;
+
+    if (gameState.score >= 50) createConfetti(60);
+}
+
+function restartGame() { startGame(); }
+
+/* ============================================================
+   CONFETTI
+   ============================================================ */
+
+function createConfetti(count = 30) {
+    const colors = ['#d4af37', '#f0d97d', '#4ade80', '#e8eaed', '#f87171'];
+    for (let i = 0; i < count; i++) {
+        const p = document.createElement('div');
+        p.className = 'confetti';
+        p.style.left = Math.random() * 100 + 'vw';
+        p.style.background = colors[Math.floor(Math.random() * colors.length)];
+        p.style.animationDuration = (1.5 + Math.random() * 1.5) + 's';
+        p.style.animationDelay = Math.random() * 0.3 + 's';
+        p.style.width = (6 + Math.random() * 8) + 'px';
+        p.style.height = (6 + Math.random() * 8) + 'px';
+        document.body.appendChild(p);
+        setTimeout(() => p.remove(), 3500);
+    }
+}
+
+/* ============================================================
+   CALCULATOR
+   ============================================================ */
+
+function initCalcSelect() {
+    const sel = $('calcType');
+    sel.innerHTML = '';
+    deadlines.forEach(d => {
+        const opt = document.createElement('option');
+        opt.value = d.id;
+        opt.textContent = d.label;
+        sel.appendChild(opt);
+    });
+}
+
+function setToday() {
+    const today = new Date();
+    const iso = today.toISOString().slice(0, 10);
+    $('calcStartDate').value = iso;
+}
+
+function addUnits(date, value, unit) {
+    const d = new Date(date.getTime());
+    if (unit === 'hours') {
+        d.setHours(d.getHours() + value);
+    } else if (unit === 'days') {
+        d.setDate(d.getDate() + value);
+    } else if (unit === 'months') {
+        const day = d.getDate();
+        d.setMonth(d.getMonth() + value);
+        // Handle month overflow (e.g., Jan 31 + 1 month = Feb 28/29)
+        if (d.getDate() !== day) {
+            d.setDate(0);
+        }
+    }
+    return d;
+}
+
+const WEEKDAYS = ['воскресенье', 'понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота'];
+const MONTHS = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+
+function fmtDate(d) {
+    const day = d.getDate();
+    const month = MONTHS[d.getMonth()];
+    const year = d.getFullYear();
+    const wd = WEEKDAYS[d.getDay()];
+    return `${day} ${month} ${year} (${wd})`;
+}
+
+function fmtWithTime(d, unit) {
+    if (unit === 'hours') {
+        const hh = String(d.getHours()).padStart(2, '0');
+        const mm = String(d.getMinutes()).padStart(2, '0');
+        return `${fmtDate(d)} · ${hh}:${mm}`;
+    }
+    return fmtDate(d);
+}
+
+function calculateDeadline() {
+    const startVal = $('calcStartDate').value;
+    const typeId = $('calcType').value;
+    const container = $('calcResultContainer');
+
+    if (!startVal) {
+        container.innerHTML = `<div class="calc-result-empty" style="color:#fbbf24;border-color:rgba(251,191,36,0.4);">⚠️ Укажите дату начала срока</div>`;
+        return;
+    }
+
+    const start = new Date(startVal + 'T00:00:00');
+    if (isNaN(start.getTime())) {
+        container.innerHTML = `<div class="calc-result-empty" style="color:#fbbf24;">⚠️ Некорректная дата</div>`;
+        return;
+    }
+
+    const d = deadlines.find(x => x.id === typeId);
+
+    // For hours, use start date at 00:00 (approximation; real moment is actual detention time)
+    const endBase = addUnits(start, d.base.value, d.base.unit);
+
+    let extensionsHtml = '';
+    if (d.extensions && d.extensions.length > 0) {
+        extensionsHtml = `<div class="extensions-title">📈 Варианты продления</div>`;
+        d.extensions.forEach(ext => {
+            let endExt;
+            if (ext.value === null) {
+                endExt = '<span class="extension-date" style="color:var(--text-muted);font-size:0.85rem;">не ограничен сроком</span>';
+            } else {
+                const e = addUnits(start, ext.value, ext.unit);
+                endExt = `<span class="extension-date">${fmtWithTime(e, ext.unit)}</span>`;
+            }
+            extensionsHtml += `
+                <div class="extension-item">
+                    <div>
+                        <div class="extension-label">${ext.label}</div>
+                        <div class="extension-by">${ext.by}</div>
+                    </div>
+                    ${endExt}
+                </div>
+            `;
+        });
+    }
+
+    const baseLabel = d.base.unit === 'days' ? 'суток' : d.base.unit === 'months' ? 'месяцев/мес.' : 'часов';
+    const baseDisplay = d.base.unit === 'months'
+        ? `${d.base.value} ${d.base.value === 1 ? 'месяц' : (d.base.value < 5 ? 'месяца' : 'месяцев')}`
+        : `${d.base.value} ${baseLabel}`;
+
+    let hoursWarning = '';
+    if (d.base.unit === 'hours') {
+        hoursWarning = `<div class="calc-note" style="background:rgba(251,191,36,0.08);border-color:rgba(251,191,36,0.3);color:#fde68a;margin-top:12px;">
+            ⚠️ <strong>Важно:</strong> срок в часах исчисляется с момента фактического задержания. В расчёте принято 00:00 указанной даты — скорректируйте вручную, если задержание было позже.
+        </div>`;
+    }
+
+    container.innerHTML = `
+        <div class="calc-result">
+            <span class="result-article">⚖ ${d.article}</span>
+            <div class="result-main-date">${fmtWithTime(endBase, d.base.unit)}</div>
+            <div class="result-main-sub">Базовый срок: <strong>${baseDisplay}</strong> · Начало: ${fmtDate(start)}</div>
+            <div class="result-desc">${d.desc}</div>
+            ${extensionsHtml}
+            ${hoursWarning}
+        </div>
+    `;
+}
+
+/* ============================================================
+   REFERENCE
+   ============================================================ */
+
+function renderReference() {
+    const grid = $('refGrid');
+    grid.innerHTML = '';
+
+    const grouped = {};
+    deadlines.forEach(d => {
+        if (!grouped[d.category]) grouped[d.category] = [];
+        grouped[d.category].push(d);
+    });
+
+    Object.keys(grouped).forEach(cat => {
+        const catTitle = document.createElement('h3');
+        catTitle.className = 'ref-category-title';
+        catTitle.textContent = cat;
+        grid.appendChild(catTitle);
+
+        grouped[cat].forEach(d => {
+            const baseDisplay = d.base.unit === 'months'
+                ? `${d.base.value} мес.`
+                : `${d.base.value} ${d.base.unit === 'days' ? 'сут.' : 'ч.'}`;
+
+            const extList = d.extensions.length
+                ? d.extensions.map(e => `<li><strong>${e.label}</strong> — ${e.by}</li>`).join('')
+                : '<li style="list-style:none;color:var(--text-dim);">Продление не предусмотрено</li>';
+
+            const card = document.createElement('div');
+            card.className = 'ref-card';
+            card.innerHTML = `
+                <div class="ref-card-header">
+                    <div class="ref-card-title">${d.label}</div>
+                    <span class="ref-card-article">${d.article}</span>
+                </div>
+                <div class="ref-card-srok">${baseDisplay}</div>
+                <div class="ref-card-desc">${d.desc}</div>
+                <div class="extensions-title" style="margin-top:12px;">Продление:</div>
+                <ul class="ref-card-ext">${extList}</ul>
+            `;
+            grid.appendChild(card);
+        });
+    });
+}
+
+/* ============================================================
+   FILES
+   ============================================================ */
+
+function renderFiles() {
+    const grid = $('filesGrid');
+    grid.innerHTML = '';
+    files.forEach(f => {
+        const card = document.createElement('a');
+        card.className = 'file-card';
+        card.href = './' + f.name;
+        card.target = '_blank';
+        card.rel = 'noopener';
+        card.setAttribute('download', f.name);
+        card.innerHTML = `
+            <div class="file-icon">${f.icon}</div>
+            <div class="file-info">
+                <div class="file-name">${f.title}</div>
+                <div class="file-desc">${f.desc}</div>
+                <div class="file-meta">
+                    <span>${f.type}</span>
+                    <span>${f.size}</span>
+                    <span>${f.name}</span>
+                </div>
+            </div>
+            <div class="file-arrow">↗</div>
+        `;
+        grid.appendChild(card);
+    });
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+
+function init() {
+    initCalcSelect();
+    setToday();
+    renderReference();
+    renderFiles();
+    updateBestScoreUI();
+    $('qTotal').textContent = questions.length;
+
+    // If user hasn't started the game yet, show start screen when clicking Квест
+    $('bestScoreStart').textContent = gameState.bestScore || '—';
+
+    // Auto-scroll fix: on hash change, navigate
+    if (location.hash) {
+        const sec = location.hash.replace('#', '');
+        if (['home', 'game', 'calc', 'ref', 'files'].includes(sec)) {
+            switchSection(sec);
+        }
+    }
+}
+
+init();
 </script>
 
 </body>
