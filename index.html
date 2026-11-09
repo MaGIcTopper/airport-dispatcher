@@ -1,156 +1,571 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ATC PRO — Airport Tower</title>
-<style>
-:root{--bg:#06101c;--line:#24435b;--cyan:#63e4f2;--green:#5ce0a0;--amber:#ffcf70;--red:#ff667d;--muted:#89a5bb}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -30%,#214563 0,#0a1b2b 42%,#050d17 100%) fixed;color:#eaf6ff;font:14px system-ui,Arial;min-height:100vh}
-header{padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;border-bottom:1px solid #29465d;background:#071421ef;position:sticky;top:0;z-index:5}
-.logo{font-weight:900;letter-spacing:2px;font-size:18px}.logo span{color:var(--cyan)}.sub{font-size:10px;color:var(--muted);letter-spacing:1.5px;margin-top:3px}
-.metrics{display:flex;gap:8px;flex-wrap:wrap}.metric{background:#10253a;border:1px solid var(--line);border-radius:10px;padding:6px 11px;min-width:76px}.metric small{display:block;color:var(--muted);font-size:9px;letter-spacing:1px;text-transform:uppercase}.metric b{font-size:17px;font-variant-numeric:tabular-nums}
-main{max-width:1500px;margin:auto;padding:16px;display:grid;grid-template-columns:minmax(0,1.65fr) minmax(320px,.85fr);gap:14px}
-.panel{background:linear-gradient(150deg,#10253a,#0a1827);border:1px solid var(--line);border-radius:14px;overflow:hidden}
-.head{padding:11px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}.head h2{font-size:11px;letter-spacing:1.6px;margin:0}.live{font-size:10px;color:var(--green)}
-.visual{position:relative;background:#071722}.visual canvas{display:block;width:100%;height:auto;aspect-ratio:1000/690;cursor:crosshair;touch-action:manipulation}
-.overlay{position:absolute;left:12px;top:12px;padding:7px 9px;border:1px solid #31556a;background:#071824c9;border-radius:8px;color:#a8c7d9;font:10px monospace;pointer-events:none}
-.cover{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:#050d17d9;text-align:center;padding:20px}.cover.on{display:flex}.cover h3{margin:0;font-size:26px;letter-spacing:2px}.cover p{margin:0;color:var(--muted);max-width:420px;line-height:1.6}
-.bottomline{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;padding:9px 14px;color:var(--muted);font-size:10px;border-top:1px solid #1d394e}
-.right{display:flex;flex-direction:column;gap:14px}.list{padding:8px;display:grid;gap:6px;max-height:250px;overflow:auto}
-.flight{display:flex;justify-content:space-between;gap:10px;padding:8px 10px;background:#091a29;border:1px solid #1b354a;border-radius:9px;cursor:pointer}.flight.active{border-color:var(--cyan);background:#123047}.flight strong{font-size:12px}.flight small{display:block;color:var(--muted);font-size:10px;margin-top:3px}
-.pill{font-size:9px;padding:4px 7px;border-radius:20px;height:max-content;background:#18384a;color:var(--cyan);white-space:nowrap}.pill.red{background:#4a2030;color:#ff9dad}.pill.green{background:#123c31;color:#82f4bb}.pill.gold{background:#46391f;color:#ffdc91}
-.detail{padding:12px 14px;color:var(--muted);font-size:11px;line-height:1.7;min-height:86px}.detail b{color:#f2f8ff}
-.bar{height:5px;background:#173047;border-radius:3px;margin-top:4px;overflow:hidden}.bar i{display:block;height:100%;background:var(--green)}
-.actions{padding:0 12px 12px;display:grid;grid-template-columns:1fr 1fr;gap:7px}
-button{font-family:inherit}.actions button,.topbtn{border:1px solid #31536c;background:#142c42;color:#e9f7ff;border-radius:8px;padding:10px 8px;font-weight:700;font-size:11px;cursor:pointer}
-.actions button:hover,.topbtn:hover{border-color:var(--cyan);background:#1a3a52}.actions button:disabled{opacity:.35;cursor:not-allowed}.actions .ok{background:#104536;border-color:#28765c;color:#9cffcf}.actions .bad{background:#482333;border-color:#8a4053;color:#ff9eae}
-button:focus-visible,select:focus-visible,canvas:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
-.message{margin:0 12px 12px;padding:9px 11px;background:#071824;border:1px solid #1b394e;border-radius:8px;color:var(--cyan);font-size:11px;min-height:36px}
-.settings{padding:11px 13px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:11px}.settings select{background:#0a1b2a;color:#eaf6ff;border:1px solid #31516a;border-radius:7px;padding:7px}
-.keys{padding:0 13px 12px;color:var(--muted);font-size:10px;line-height:1.7}kbd{background:#142c42;border:1px solid #31536c;border-radius:4px;padding:0 5px;color:#e9f7ff;font:10px monospace}
-.log{padding:10px 13px;max-height:130px;overflow:auto;font:10px/1.7 monospace;color:#9cb6c8}.log div{border-bottom:1px solid #173047;padding:2px 0}
-footer{text-align:center;padding:5px 20px 22px;color:#607c91;font-size:10px}
-@media(max-width:900px){main{grid-template-columns:1fr}.right{display:grid;grid-template-columns:1fr 1fr}.right .panel:first-child{grid-column:1/-1}}
-@media(max-width:560px){header{align-items:flex-start}.metrics{width:100%}.metric{flex:1;min-width:60px;padding:5px 7px}.right{display:flex}main{padding:10px}.keys{display:none}}
-@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
-</style></head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Следователь СК — Интерактивный квест</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            background: #1a1e24;
+            color: #e0e0e0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.5;
+        }
+
+        .game-container {
+            max-width: 800px;
+            width: 100%;
+            background: #22272e;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7), 0 0 0 2px #3a404a;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 600px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0b2b3b, #1e4a5f);
+            padding: 20px 30px;
+            border-bottom: 3px solid #c9a84c;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 1.6rem;
+            color: #f0e6d0;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+            letter-spacing: 1px;
+        }
+
+        .score-box {
+            background: #0b2b3b;
+            padding: 8px 18px;
+            border-radius: 30px;
+            border: 1px solid #c9a84c;
+            font-weight: bold;
+            color: #f0e6d0;
+            font-size: 1.1rem;
+        }
+
+        .score-box span {
+            color: #f5d98b;
+        }
+
+        .content {
+            padding: 30px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .screen {
+            display: none;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        .start-screen {
+            text-align: center;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .start-screen h2 {
+            font-size: 2rem;
+            color: #f0e6d0;
+            margin-bottom: 20px;
+        }
+
+        .start-screen p {
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            color: #b0b8c0;
+            max-width: 600px;
+        }
+
+        .btn {
+            background: #c9a84c;
+            color: #1a1e24;
+            border: none;
+            padding: 14px 40px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            box-shadow: 0 4px 0 #8a6f2e;
+            letter-spacing: 1px;
+        }
+
+        .btn:hover {
+            background: #e0c060;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 #8a6f2e;
+        }
+
+        .btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #8a6f2e;
+        }
+
+        .btn:disabled {
+            background: #5a5a5a;
+            box-shadow: 0 4px 0 #333;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .question-screen {
+            justify-content: flex-start;
+        }
+
+        .scenario-box {
+            background: #2d333b;
+            border-left: 5px solid #c9a84c;
+            padding: 20px 25px;
+            margin-bottom: 25px;
+            border-radius: 0 12px 12px 0;
+            font-style: italic;
+            color: #d0d8e0;
+            font-size: 1.05rem;
+        }
+
+        .question-text {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #f0e6d0;
+            margin-bottom: 20px;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .option {
+            background: #2d333b;
+            border: 2px solid #3a404a;
+            border-radius: 12px;
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            font-size: 1rem;
+            color: #e0e0e0;
+            text-align: left;
+            font-family: inherit;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .option:hover:not(.disabled) {
+            border-color: #c9a84c;
+            background: #353c46;
+        }
+
+        .option.selected-correct {
+            border-color: #4caf50;
+            background: #1e3a2a;
+            box-shadow: 0 0 15px rgba(76, 175, 80, 0.2);
+        }
+
+        .option.selected-wrong {
+            border-color: #f44336;
+            background: #3a1e1e;
+            box-shadow: 0 0 15px rgba(244, 67, 54, 0.2);
+        }
+
+        .option.disabled {
+            cursor: default;
+            opacity: 0.8;
+        }
+
+        .option .letter {
+            font-weight: bold;
+            color: #c9a84c;
+            min-width: 24px;
+        }
+
+        .feedback {
+            margin-top: 10px;
+            padding: 15px 20px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            display: none;
+        }
+
+        .feedback.correct {
+            display: block;
+            background: #1e3a2a;
+            border: 1px solid #4caf50;
+            color: #b9f6ca;
+        }
+
+        .feedback.wrong {
+            display: block;
+            background: #3a1e1e;
+            border: 1px solid #f44336;
+            color: #ffcdd2;
+        }
+
+        .feedback .law-ref {
+            display: block;
+            margin-top: 8px;
+            font-size: 0.9rem;
+            color: #c9a84c;
+            font-weight: bold;
+        }
+
+        .result-screen {
+            text-align: center;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .result-screen h2 {
+            font-size: 2.2rem;
+            margin-bottom: 15px;
+            color: #f0e6d0;
+        }
+
+        .result-score {
+            font-size: 3.5rem;
+            color: #c9a84c;
+            font-weight: bold;
+            margin: 20px 0;
+            text-shadow: 0 0 20px rgba(201, 168, 76, 0.3);
+        }
+
+        .result-verdict {
+            font-size: 1.3rem;
+            color: #b0b8c0;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #2d333b;
+            border-radius: 4px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #c9a84c, #e0c060);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .progress-text {
+            text-align: right;
+            font-size: 0.85rem;
+            color: #8892a0;
+            margin-top: 5px;
+        }
+
+        .footer {
+            padding: 15px 30px;
+            background: #1a1e24;
+            border-top: 1px solid #2d333b;
+            font-size: 0.8rem;
+            color: #5a6470;
+            text-align: center;
+        }
+
+        .highlight {
+            color: #f5d98b;
+            font-weight: bold;
+        }
+
+        @media (max-width: 600px) {
+            .header {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+            .header h1 {
+                font-size: 1.3rem;
+            }
+            .content {
+                padding: 20px;
+            }
+            .question-text {
+                font-size: 1.1rem;
+            }
+            .option {
+                font-size: 0.95rem;
+                padding: 12px 15px;
+            }
+        }
+    </style>
+</head>
 <body>
-<header><div><div class="logo">✈ ATC <span>PRO</span></div><div class="sub">AIR TRAFFIC CONTROL · INTERNATIONAL AIRPORT</div></div>
-<div class="metrics"><div class="metric"><small>Рейтинг</small><b id="score">0</b></div><div class="metric"><small>Рекорд</small><b id="best">0</b></div><div class="metric"><small>Обслужено</small><b id="served">0</b></div><div class="metric"><small>Инциденты</small><b id="inc">0/3</b></div><div class="metric"><small>Погода</small><b id="weather">Ясно</b></div><div class="metric"><small>Время</small><b id="clock">08:00</b></div></div></header>
-<main>
-<section class="panel"><div class="head"><h2>РАДАР + СХЕМА АЭРОПОРТА</h2><span class="live" id="live">● СИМУЛЯЦИЯ АКТИВНА</span></div>
-<div class="visual"><canvas id="screen" tabindex="0" aria-label="Радар аэропорта"></canvas><div class="overlay">TWR 118.700 MHz<br>RWY 09 · ALFA / BRAVO</div>
-<div class="cover" id="cover"><h3 id="coverT"></h3><p id="coverP"></p><button class="topbtn" id="coverB"></button></div></div>
-<div class="bottomline"><span>Голубой — подлёт · Жёлтый — ожидание · Зелёный — посадка · Фиолетовый — взлёт · Красный — опасное сближение</span><span id="traffic">Трафик: низкий</span></div></section>
-<div class="right">
-<section class="panel"><div class="head"><h2>ПАНЕЛЬ РЕЙСОВ</h2><span class="live" id="count">0 бортов</span></div><div class="list" id="flights"></div></section>
-<section class="panel"><div class="head"><h2>КОМАНДЫ ДИСПЕТЧЕРА</h2><span class="live" id="picked">НЕТ ВЫБОРА</span></div>
-<div class="detail" id="detail"></div>
-<div class="actions"><button class="ok" id="approach" disabled>🛬 Заход на посадку</button><button id="hold" disabled>⏱ Ожидание / сменить точку</button><button class="ok" id="takeoff" disabled>🛫 Разрешить взлёт</button><button id="goaround" disabled>↗ Второй круг</button><button id="up" disabled>▲ Эшелон +1000</button><button id="down" disabled>▼ Эшелон −1000</button><button id="pause">⏸ Пауза</button><button id="speed">⏩ Скорость ×1</button><button id="weatherBtn">🌦 Сменить погоду</button><button class="bad" id="reset">↻ Новая смена</button></div>
-<div class="message" id="message"></div></section>
-<section class="panel"><div class="head"><h2>ЖУРНАЛ ДИСПЕТЧЕРА</h2><span class="live">REC</span></div><div class="log" id="log"></div></section>
-<section class="panel"><div class="head"><h2>ПАРАМЕТРЫ СМЕНЫ</h2></div><div class="settings"><label>Сложность <select id="difficulty"><option value="1">Курсант</option><option value="1.35" selected>Обычная</option><option value="1.8">Профессионал</option></select></label><label><input type="checkbox" id="sound" checked> Звук</label></div>
-<div class="keys"><kbd>←</kbd><kbd>→</kbd> выбор борта · <kbd>A</kbd> посадка · <kbd>H</kbd> ожидание · <kbd>T</kbd> взлёт · <kbd>G</kbd> второй круг · <kbd>↑</kbd><kbd>↓</kbd> эшелон · <kbd>Пробел</kbd> пауза<br>Три инцидента (сближение или падение без топлива) — смена окончена. Садите борты по одному: на ВПП может быть только один самолёт.</div></section>
-</div></main><footer>ATC PRO · Аркадный авиадиспетчерский симулятор. Не является учебным средством для реального управления воздушным движением.</footer>
-<script>
-const $=i=>document.getElementById(i),c=$('screen'),g=c.getContext('2d'),W=1000,H=690,PI=Math.PI;
-const dpr=Math.min(window.devicePixelRatio||1,2);c.width=W*dpr;c.height=H*dpr;g.scale(dpr,dpr);
-const RW={x1:250,x2:750,y:555,td:300},FIX=[{n:'ALFA',x:270,y:190},{n:'BRAVO',x:730,y:190}],R=75,IAF={x:110,y:555},EXIT={x:1060,y:300};
-const CALLS=['DLH 482','SAS 117','AFL 920','BAW 031','KLM 668','LOT 214','EZY 551','UAE 073','RYR 808','AFR 390','THY 1523','FIN 742','SWR 188','VLG 624'];
-const COL={inbound:'#65dff0',hold:'#ffd16e',final:'#5de5a4',landing:'#5de5a4',taxi:'#8ba5bb',gate:'#8ba5bb',takeoff:'#b7a0ff'};
-const ST={inbound:'Входящий',hold:'Зона ожидания',final:'Заход на посадку',landing:'Пробег по ВПП',taxi:'Руление к стоянке',gate:'На стоянке',takeoff:'Взлёт'};
-const AIR=['inbound','hold','final'],gx=i=>425+i*45,GY=607;
-let S,best=0;try{best=+localStorage.getItem('atcBest')||0}catch(e){}
-const diff=()=>+$('difficulty').value,wf=()=>S.wx==='Дождь'?.92:S.wx==='Туман'?.85:1,rnd=(a,b)=>a+Math.random()*(b-a);
-let au;function beep(f,d=.12){if(!$('sound').checked)return;try{au=au||new AudioContext();let o=au.createOscillator(),n=au.createGain();o.frequency.value=f;n.gain.value=.04;o.connect(n);n.connect(au.destination);o.start();o.stop(au.currentTime+d)}catch(e){}}
-function init(){S={ac:[],sel:null,score:0,served:0,inc:0,t:0,spawn:2,wx:'Ясно',wind:4,wxT:75,rw:null,gates:[null,null,null,null,null],pause:false,over:false,speed:1,logs:[],tr:0};
-$('cover').classList.remove('on');$('weather').textContent='Ясно';$('pause').textContent='⏸ Пауза';
-for(let i=0;i<2;i++){let p=mk('gate');p.gate=i;S.gates[i]=p;p.wait=4+i*5;p.x=gx(i);p.y=GY}
-spawn();spawn();log('Смена началась. Принимайте входящие рейсы и выпускайте борты со стоянок.');msg('Выберите борт на радаре или в списке.');ui()}
-function mk(st){let call;do call=CALLS[Math.random()*CALLS.length|0];while(S.ac.some(a=>a.call===call));let p={call,x:0,y:0,hd:0,spd:rnd(42,52),alt:0,tAlt:0,fuel:rnd(45,100),st,fix:FIX[0],trail:[],cd:0,wp:[],wait:0,ready:false,gate:-1,low:false};S.ac.push(p);return p}
-function spawn(){let p=mk('inbound'),e=Math.random()*3|0;p.x=e===0?-10:e===1?W+10:rnd(40,960);p.y=e===2?-10:rnd(40,380);p.fix=FIX[p.x<500?0:1];p.hd=Math.atan2(p.fix.y-p.y,p.fix.x-p.x);p.alt=p.tAlt=3000+1000*(Math.random()*7|0);log(`Входящий ${p.call}, FL${p.alt/100|0}, топливо ${p.fuel|0}%.`)}
-function clock(){let m=480+Math.floor(S.t);return String(Math.floor(m/60)%24).padStart(2,'0')+':'+String(m%60).padStart(2,'0')}
-function log(s){S.logs.unshift(`<div>[${clock()}] ${s}</div>`);S.logs=S.logs.slice(0,14);$('log').innerHTML=S.logs.join('')}
-function msg(s){$('message').textContent=s;log(s)}
-function turn(p,tx,ty,dt){let d=((Math.atan2(ty-p.y,tx-p.x)-p.hd+PI*3)%(PI*2))-PI,m=1.5*dt;p.hd+=Math.max(-m,Math.min(m,d))}
-function go(p,v){p.x+=Math.cos(p.hd)*v;p.y+=Math.sin(p.hd)*v}
-function addScore(n){S.score+=n;if(S.score>best){best=S.score;try{localStorage.setItem('atcBest',best)}catch(e){}}}
-function incident(why){S.inc++;addScore(-250);beep(150,.4);msg('ИНЦИДЕНТ: '+why);if(S.inc>=3)end()}
-function end(){S.over=true;$('coverT').textContent='СМЕНА ОКОНЧЕНА';$('coverP').textContent=`Рейтинг ${S.score}, обслужено рейсов: ${S.served}. Рекорд: ${best}.`;$('coverB').textContent='Начать новую смену';$('coverB').onclick=init;$('cover').classList.add('on')}
-function free(p){if(S.rw===p)S.rw=null;if(p.gate>=0&&S.gates[p.gate]===p&&p.st!=='gate')S.gates[p.gate]=null}
-function remove(p){free(p);if(p.gate>=0&&S.gates[p.gate]===p)S.gates[p.gate]=null;S.ac=S.ac.filter(a=>a!==p);if(S.sel===p)S.sel=null}
-function step(dt){S.t+=dt;S.wxT-=dt;S.spawn-=dt;S.tr-=dt;
-if(S.wxT<=0){S.wxT=rnd(60,100);setWx(['Ясно','Дождь','Туман'][Math.random()*3|0],true)}
-if(S.spawn<=0&&S.ac.filter(p=>AIR.includes(p.st)).length<8){spawn();S.spawn=rnd(.7,1.3)*16/diff()}
-for(const p of [...S.ac]){let v=p.spd*wf()*dt;
-if(AIR.includes(p.st)){p.fuel-=.4*dt;if(p.fuel<25&&!p.low){p.low=true;beep(520,.3);msg(`${p.call}: MAYDAY, мало топлива (${p.fuel|0}%). Дайте посадку!`)}
-if(p.fuel<=0){remove(p);incident(`${p.call} упал без топлива.`);continue}}
-if(p.st==='inbound'||p.st==='hold'){let f=p.fix,d=Math.hypot(p.x-f.x,p.y-f.y),tx,ty;
-if(d>R+45){tx=f.x;ty=f.y}else{let a=Math.atan2(p.y-f.y,p.x-f.x)+.7;tx=f.x+Math.cos(a)*R;ty=f.y+Math.sin(a)*R;if(p.st==='inbound'){p.st='hold';log(`${p.call}: вошёл в зону ожидания ${f.n}.`)}}
-turn(p,tx,ty,dt);go(p,v);let da=p.tAlt-p.alt;p.alt+=Math.sign(da)*Math.min(Math.abs(da),400*dt)}
-else if(p.st==='final'){let w=p.wp[0];turn(p,w.x,w.y,dt);go(p,v);let ta=Math.hypot(p.x-RW.td,p.y-RW.y)*8;if(p.alt>ta)p.alt=Math.max(ta,p.alt-800*dt);
-if(Math.hypot(p.x-w.x,p.y-w.y)<12){p.wp.shift();if(!p.wp.length){p.st='landing';p.alt=0;p.hd=0;p.spd=48}}}
-else if(p.st==='landing'){p.spd=Math.max(14,p.spd-12*dt);go(p,p.spd*dt);if(p.x>=660){p.st='taxi';S.rw=null;p.hd=PI/2}}
-else if(p.st==='taxi'){let tx=gx(p.gate),ty=GY;turn(p,tx,ty,dt*3);go(p,28*dt);if(Math.hypot(p.x-tx,p.y-ty)<5){p.st='gate';p.x=tx;p.y=ty;p.wait=rnd(6,14);p.ready=false;p.hd=0;S.served++;let b=100+Math.round(p.fuel/2);addScore(b);beep(880,.15);msg(`${p.call}: посадка завершена, +${b}.`)}}
-else if(p.st==='gate'){if(!p.ready){p.wait-=dt;if(p.wait<=0){p.ready=true;msg(`${p.call}: готов к вылету.`)}}}
-else if(p.st==='takeoff'){p.spd=Math.min(95,p.spd+38*dt);if(p.x<RW.x2){p.hd=0;go(p,p.spd*dt);if(p.x>650)p.alt+=500*dt}else{if(S.rw===p)S.rw=null;p.alt+=500*dt;turn(p,EXIT.x,EXIT.y,dt);go(p,p.spd*dt);if(p.x>W+20||p.y<-20){remove(p);S.served++;addScore(80);beep(660,.12);msg(`${p.call}: вылет выполнен, +80.`);continue}}}
-p.cd=Math.max(0,p.cd-dt);p.warn=false;
-if(S.tr<=0&&p.st!=='gate'&&p.st!=='taxi'){p.trail.push({x:p.x,y:p.y});if(p.trail.length>9)p.trail.shift()}}
-if(S.tr<=0)S.tr=1.1;
-let fl=S.ac.filter(p=>AIR.includes(p.st)||(p.st==='takeoff'&&p.alt>150));
-for(let i=0;i<fl.length;i++)for(let j=i+1;j<fl.length;j++){let a=fl[i],b=fl[j],d=Math.hypot(a.x-b.x,a.y-b.y);if(Math.abs(a.alt-b.alt)>=900)continue;
-if(d<60){if(!a.warn&&!b.warn&&!a.cd&&!b.cd)beep(300,.06);a.warn=b.warn=true}
-if(d<30&&!a.cd&&!b.cd){a.cd=b.cd=8;incident(`опасное сближение ${a.call} и ${b.call}.`)}}}
-function setWx(w,auto){S.wx=w;S.wind=w==='Ясно'?4:w==='Дождь'?13:7;$('weather').textContent=w;msg(`${auto?'Погода меняется':'Погода изменена'}: ${w.toLowerCase()}, ветер ${S.wind} уз.`+(w==='Ясно'?'':' Самолёты летят медленнее.'))}
-function cmd(a){let p=S.sel;if(!p||S.over||S.pause)return;
-if(a==='approach'){if(!['inbound','hold'].includes(p.st))return;
-if(S.rw)return msg(`ВПП занята (${S.rw.call}). Отправьте ${p.call} в ожидание.`);
-let gi=S.gates.indexOf(null);if(gi<0)return msg('Нет свободных стоянок. Выпустите борт со стоянки на вылет.');
-S.gates[gi]=p;p.gate=gi;S.rw=p;p.st='final';p.wp=[{x:IAF.x,y:IAF.y},{x:RW.td,y:RW.y}];msg(`${p.call}: заход на ВПП 09 разрешён. Стоянка A${gi+1}. Ветер ${S.wind} уз.`)}
-else if(a==='hold'){if(!['inbound','hold'].includes(p.st))return;p.fix=FIX[1-FIX.indexOf(p.fix)];p.st='inbound';msg(`${p.call}: следуйте в зону ожидания ${p.fix.n}.`)}
-else if(a==='goaround'){if(p.st!=='final')return;free(p);p.gate=-1;p.st='inbound';p.fix=FIX[p.x<500?0:1];p.tAlt=4000+1000*(Math.random()*4|0);addScore(-20);msg(`${p.call}: уход на второй круг, −20.`)}
-else if(a==='takeoff'){if(p.st!=='gate'||!p.ready)return;if(S.rw)return msg(`ВПП занята (${S.rw.call}). Подождите.`);
-S.gates[p.gate]=null;p.gate=-1;p.st='takeoff';S.rw=p;p.x=RW.x1;p.y=RW.y;p.hd=0;p.spd=10;p.alt=0;msg(`${p.call}: ВПП 09 свободна, взлёт разрешён.`)}
-else if(a==='up'||a==='down'){if(!['inbound','hold'].includes(p.st))return;p.tAlt=Math.max(2000,Math.min(10000,p.tAlt+(a==='up'?1000:-1000)));msg(`${p.call}: займите эшелон FL${p.tAlt/100}.`)}
-ui()}
-function pick(p){S.sel=p;ui()}
-function cycle(d){if(!S.ac.length)return;let i=S.ac.indexOf(S.sel);pick(S.ac[(i+d+S.ac.length*2)%S.ac.length])}
-function ui(){$('score').textContent=S.score;$('best').textContent=best;$('served').textContent=S.served;$('inc').textContent=S.inc+'/3';$('clock').textContent=clock();
-$('count').textContent=S.ac.length+' бортов';let n=S.ac.filter(p=>AIR.includes(p.st)).length;$('traffic').textContent='Трафик: '+(n>5?'высокий':n>2?'средний':'низкий');
-let L=$('flights');L.innerHTML='';S.ac.forEach(p=>{let e=document.createElement('div'),k=p.warn?'red':p.st==='gate'?(p.ready?'green':''):p.st==='hold'?'gold':'';e.className='flight'+(p===S.sel?' active':'');
-e.innerHTML=`<div><strong>${p.call}</strong><small>${p.st==='gate'?(p.ready?'Готов к вылету':'Обслуживание'):ST[p.st]} · ⛽${Math.max(0,p.fuel|0)}%</small></div><span class="pill ${k}">${p.warn?'СБЛИЖЕНИЕ':p.st==='gate'&&p.ready?'ВЫЛЕТ':p.st==='final'?'ПОСАДКА':p.st==='gate'?'ГЕЙТ':p.st.toUpperCase()}</span>`;e.onclick=()=>pick(p);L.appendChild(e)});
-let p=S.sel;$('picked').textContent=p?p.call:'НЕТ ВЫБОРА';
-$('detail').innerHTML=p?`<b>${p.call}</b> — ${ST[p.st]}<br>Эшелон: FL${Math.round(p.alt/100)}${AIR.includes(p.st)&&p.st!=='final'?' (цель FL'+p.tAlt/100+')':''}${p.gate>=0?' · Стоянка A'+(p.gate+1):''}<br>Топливо: ${Math.max(0,p.fuel|0)}%<div class="bar"><i style="width:${Math.max(0,p.fuel)}%;background:${p.fuel<25?'var(--red)':p.fuel<50?'var(--amber)':'var(--green)'}"></i></div>`:'Выберите борт на радаре или в списке. Входящих — на посадку или в ожидание, борты со стоянок — на взлёт. ВПП: '+(S.rw?'занята ('+S.rw.call+')':'свободна');
-let a=p&&['inbound','hold'].includes(p.st);$('approach').disabled=!a;$('hold').disabled=!a;$('up').disabled=!a;$('down').disabled=!a;$('takeoff').disabled=!(p&&p.st==='gate'&&p.ready);$('goaround').disabled=!(p&&p.st==='final')}
-function draw(T){g.fillStyle='#071923';g.fillRect(0,0,W,H);
-g.strokeStyle='#12323f';g.lineWidth=1;for(let x=0;x<W;x+=50){g.beginPath();g.moveTo(x,0);g.lineTo(x,H);g.stroke()}for(let y=0;y<H;y+=50){g.beginPath();g.moveTo(0,y);g.lineTo(W,y);g.stroke()}
-g.strokeStyle='#28606a';g.lineWidth=1.5;for(let r=90;r<600;r+=110){g.beginPath();g.arc(500,400,r,0,PI*2);g.stroke()}
-let sa=(T*1.2)%(PI*2);for(let i=0;i<16;i++){g.strokeStyle=`rgba(99,228,242,${.16-i*.01})`;g.lineWidth=3;g.beginPath();g.moveTo(500,400);g.lineTo(500+Math.cos(sa-i*.035)*760,400+Math.sin(sa-i*.035)*760);g.stroke()}
-g.setLineDash([8,7]);g.strokeStyle='#3d7f86';g.lineWidth=1;g.beginPath();g.moveTo(IAF.x-60,RW.y);g.lineTo(RW.td,RW.y);g.stroke();
-FIX.forEach(f=>{g.beginPath();g.arc(f.x,f.y,R,0,PI*2);g.stroke()});g.setLineDash([]);
-g.fillStyle='#9ab5c4';g.font='11px monospace';FIX.forEach(f=>{g.beginPath();g.moveTo(f.x,f.y-7);g.lineTo(f.x+6,f.y+5);g.lineTo(f.x-6,f.y+5);g.closePath();g.stroke();g.fillText(f.n,f.x+10,f.y+4)});g.fillText('IAF',IAF.x-10,IAF.y-12);
-g.fillStyle=S.rw?'#4a2c3a':'#293c4b';g.fillRect(RW.x1,RW.y-24,RW.x2-RW.x1,48);g.fillStyle='#d8e3e6';for(let x=RW.x1+25;x<RW.x2-25;x+=35)g.fillRect(x,RW.y-2,18,4);g.fillText('09',RW.x1+6,RW.y+4);g.fillText('27',RW.x2-20,RW.y+4);
-g.fillStyle='#172d3b';g.fillRect(400,585,250,45);g.strokeStyle='#54798a';g.strokeRect(400,585,250,45);g.fillStyle='#9ab5c4';g.fillText('TERMINAL',410,598);
-for(let i=0;i<5;i++){g.fillStyle=S.gates[i]?'#1d4a3a':'#1f3a4b';g.fillRect(gx(i)-9,612,18,14);g.fillStyle='#9ab5c4';g.font='9px monospace';g.fillText('A'+(i+1),gx(i)-7,639)}
-g.font='11px monospace';g.fillStyle='#6f8c9e';g.fillText('N',493,16);g.fillText('S',493,H-8);
-for(const p of S.ac){let col=COL[p.st],sel=p===S.sel;
-p.trail.forEach((t,i)=>{g.fillStyle=col+'55';g.fillRect(t.x-1.5,t.y-1.5,3,3)});
-if(p.st==='gate'){g.fillStyle=p.ready?'#5ce0a0':'#8ba5bb';g.fillRect(p.x-7,p.y-5,14,10);g.fillStyle=col;g.font='9px monospace';g.fillText(p.call,p.x-17,p.y+22)}
-else{g.save();g.translate(p.x,p.y);g.rotate(p.hd);g.fillStyle=col;g.beginPath();g.moveTo(14,0);g.lineTo(-9,-7);g.lineTo(-4,0);g.lineTo(-9,7);g.closePath();g.fill();g.restore();
-g.font='11px monospace';g.fillStyle=p.fuel<25&&Math.floor(T*3)%2?'#ff667d':col;g.fillText(p.call,p.x+14,p.y-9);g.font='9px monospace';g.fillStyle=col;g.fillText('FL'+Math.round(p.alt/100)+(p.fuel<25?' ⛽'+(p.fuel|0):''),p.x+14,p.y+3)}
-if(sel){g.strokeStyle='#fff';g.lineWidth=1.5;g.beginPath();g.arc(p.x,p.y,22,0,PI*2);g.stroke()}
-if(p.warn){g.strokeStyle='#ff637c';g.lineWidth=2;g.beginPath();g.arc(p.x,p.y,30+Math.sin(T*10)*3,0,PI*2);g.stroke()}}
-if(S.wx==='Туман'){g.fillStyle='#c5d5df22';g.fillRect(0,0,W,H)}else if(S.wx==='Дождь'){g.strokeStyle='#8ac7e044';g.lineWidth=1;for(let i=0;i<60;i++){let x=(i*97+T*80)%W,y=(i*61+T*420)%H;g.beginPath();g.moveTo(x,y);g.lineTo(x-5,y+13);g.stroke()}}}
-let last=performance.now(),uiT=0;
-function frame(now){let dt=Math.min(.1,(now-last)/1000);last=now;if(!S.pause&&!S.over){step(dt*S.speed);if(now-uiT>300){uiT=now;ui()}}draw(now/1000);requestAnimationFrame(frame)}
-function togglePause(){if(S.over)return;S.pause=!S.pause;$('pause').textContent=S.pause?'▶ Продолжить':'⏸ Пауза';$('live').textContent=S.pause?'❚❚ ПАУЗА':'● СИМУЛЯЦИЯ АКТИВНА';$('coverT').textContent='ПАУЗА';$('coverP').textContent='Симуляция остановлена.';$('coverB').textContent='Продолжить';$('coverB').onclick=togglePause;$('cover').classList.toggle('on',S.pause)}
-['approach','hold','takeoff','goaround','up','down'].forEach(a=>$(a).onclick=()=>cmd(a));
-$('pause').onclick=togglePause;$('reset').onclick=init;
-$('speed').onclick=()=>{S.speed=S.speed===1?2:1;$('speed').textContent='⏩ Скорость ×'+S.speed};
-$('weatherBtn').onclick=()=>{if(!S.over)setWx(S.wx==='Ясно'?'Дождь':S.wx==='Дождь'?'Туман':'Ясно')};
-$('difficulty').onchange=()=>msg('Сложность изменена: новые рейсы будут поступать с другой частотой.');
-c.addEventListener('click',e=>{let r=c.getBoundingClientRect(),x=(e.clientX-r.left)*W/r.width,y=(e.clientY-r.top)*H/r.height,b=null,bd=34;S.ac.forEach(p=>{let d=Math.hypot(p.x-x,p.y-y);if(d<bd){bd=d;b=p}});if(b)pick(b)});
-addEventListener('keydown',e=>{if(e.target.tagName==='SELECT')return;let k=e.key.toLowerCase(),m={a:'approach',h:'hold',t:'takeoff',g:'goaround',arrowup:'up',arrowdown:'down'};
-if(m[k]){e.preventDefault();cmd(m[k])}else if(k===' '&&e.target.tagName!=='BUTTON'){e.preventDefault();togglePause()}else if(k==='arrowright')cycle(1);else if(k==='arrowleft')cycle(-1)});
-init();requestAnimationFrame(frame);
-</script></body></html>
+    <div class="game-container">
+        <div class="header">
+            <h1>🔍 Следователь СК</h1>
+            <div class="score-box">Очки: <span id="scoreDisplay">0</span></div>
+        </div>
+
+        <div class="content">
+            <!-- Стартовый экран -->
+            <div id="screen-start" class="screen start-screen active">
+                <h2>Интерактивный квест</h2>
+                <p>Вы — следователь Следственного комитета. Вам предстоит раскрыть дело о разбойном нападении, принимая процессуальные решения на основе Уголовного и Уголовно-процессуального кодексов РФ.</p>
+                <p>За правильные ответы вы получаете <span class="highlight">+10 очков</span>, за неправильные — <span class="highlight">−5 очков</span>.</p>
+                <button class="btn" onclick="startGame()">Начать расследование</button>
+            </div>
+
+            <!-- Экран вопроса -->
+            <div id="screen-question" class="screen question-screen">
+                <div class="scenario-box" id="scenarioText"></div>
+                <div class="question-text" id="questionText"></div>
+                <div class="options" id="optionsContainer"></div>
+                <div class="feedback" id="feedbackBox"></div>
+                <div style="margin-top: auto; display: flex; justify-content: flex-end;">
+                    <button class="btn" id="nextBtn" onclick="nextQuestion()" disabled>Далее →</button>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text" id="progressText"></div>
+            </div>
+
+            <!-- Экран результата -->
+            <div id="screen-result" class="screen result-screen">
+                <h2>Дело закрыто</h2>
+                <div class="result-score" id="finalScore">0</div>
+                <div class="result-verdict" id="finalVerdict"></div>
+                <button class="btn" onclick="restartGame()">Начать заново</button>
+            </div>
+        </div>
+
+        <div class="footer">
+            УК РФ и УПК РФ — основа игры. Все совпадения с реальными делами случайны.
+        </div>
+    </div>
+
+    <script>
+        // Данные игры
+        const questions = [
+            {
+                scenario: "В дежурную часть поступило сообщение о разбойном нападении на ювелирный магазин. Неизвестный, угрожая пистолетом, разбил витрину и похитил золотые украшения на сумму 1 500 000 рублей. Продавец не пострадала.",
+                question: "Какое решение должен принять следователь?",
+                options: [
+                    { text: "Возбудить уголовное дело по ст. 162 УК РФ (разбой)", correct: true },
+                    { text: "Отказать в возбуждении, так как нет заявления потерпевшего", correct: false },
+                    { text: "Возбудить уголовное дело по ст. 158 УК РФ (кража)", correct: false }
+                ],
+                explanation: "Разбой (ст. 162 УК РФ) — публичное обвинение. Дело возбуждается по сообщению о преступлении, независимо от заявления потерпевшего. Квалификация по ст. 158 неверна, так как было применено насилие (угроза пистолетом).",
+                law: "УК РФ, ст. 162; УПК РФ, ст. 140, 146"
+            },
+            {
+                scenario: "Вы возбудили уголовное дело. На месте происшествия обнаружены следы обуви, осколки витрины, гильза от пистолета. Продавец даёт показания.",
+                question: "Какое следственное действие необходимо провести в первую очередь для фиксации следов?",
+                options: [
+                    { text: "Осмотр места происшествия", correct: true },
+                    { text: "Допрос подозреваемого", correct: false },
+                    { text: "Обыск в квартире вероятного подозреваемого", correct: false }
+                ],
+                explanation: "Осмотр места происшествия — неотложное следственное действие, направленное на обнаружение и фиксацию следов преступления (ст. 176, 177 УПК РФ). Подозреваемого ещё нет, а обыск требует оснований.",
+                law: "УПК РФ, ст. 176, 177"
+            },
+            {
+                scenario: "В ходе оперативно-розыскных мероприятий задержан гражданин К., подозреваемый в совершении разбоя. Он был застигнут при попытке сбыть похищенные украшения.",
+                question: "Какой максимальный срок задержания подозреваемого без судебного решения допускается по УПК РФ?",
+                options: [
+                    { text: "48 часов", correct: true },
+                    { text: "72 часа", correct: false },
+                    { text: "24 часа", correct: false }
+                ],
+                explanation: "Согласно ст. 10 и ст. 94 УПК РФ, до судебного решения лицо не может быть подвергнуто задержанию на срок более 48 часов. По истечении этого срока оно подлежит освобождению, если суд не избрал меру пресечения.",
+                law: "УПК РФ, ст. 10, 94"
+            },
+            {
+                scenario: "Вы располагаете достаточными основаниями полагать, что подозреваемый К. может скрыться. Необходимо избрать меру пресечения в виде заключения под стражу.",
+                question: "Кто уполномочен принять решение о заключении под стражу?",
+                options: [
+                    { text: "Суд (судья районного суда)", correct: true },
+                    { text: "Следователь с согласия руководителя следственного органа", correct: false },
+                    { text: "Прокурор", correct: false }
+                ],
+                explanation: "Заключение под стражу — исключительная мера пресечения, применяемая только по судебному решению (ст. 108 УПК РФ). Следователь возбуждает ходатайство, но решение принимает суд.",
+                law: "УПК РФ, ст. 108"
+            },
+            {
+                scenario: "Подозреваемый К. сознался в содеянном и сообщил, что пистолет, которым он угрожал, является газовым, но он использовал его как предмет, имитирующий оружие. Украшения он планировал продать.",
+                question: "Как квалифицировать действия К. с учётом показаний и обстоятельств дела?",
+                options: [
+                    { text: "Ч. 2 ст. 162 УК РФ — разбой, совершённый с применением оружия или предметов, используемых в качестве оружия", correct: true },
+                    { text: "Ч. 1 ст. 162 УК РФ — разбой без квалифицирующих признаков", correct: false },
+                    { text: "Ст. 111 УК РФ — умышленное причинение тяжкого вреда здоровью", correct: false }
+                ],
+                explanation: "Использование газового пистолета (предмета, используемого в качестве оружия) при разбойном нападении образует квалифицированный состав по ч. 2 ст. 162 УК РФ. Вреда здоровью не причинено, поэтому ст. 111 неприменима.",
+                law: "УК РФ, ст. 162, ч. 2"
+            },
+            {
+                scenario: "При задержании К. заявил, что желает воспользоваться помощью защитника, но не может его пригласить, так как не имеет средств.",
+                question: "Какое право имеет подозреваемый в данном случае?",
+                options: [
+                    { text: "Право на бесплатную помощь защитника, предоставляемого государством", correct: true },
+                    { text: "Право отказаться от защитника и защищаться самостоятельно", correct: false },
+                    { text: "Право на один телефонный звонок", correct: false }
+                ],
+                explanation: "Подозреваемый имеет право на защитника, в том числе бесплатно, в случаях, предусмотренных законом (ст. 16, 46, 49, 51 УПК РФ). Следователь обязан обеспечить участие защитника, если подозреваемый не может его пригласить.",
+                law: "УПК РФ, ст. 16, 46, 49, 51"
+            }
+        ];
+
+        // Состояние игры
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let answered = false;
+
+        // DOM элементы
+        const screenStart = document.getElementById('screen-start');
+        const screenQuestion = document.getElementById('screen-question');
+        const screenResult = document.getElementById('screen-result');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const scenarioText = document.getElementById('scenarioText');
+        const questionText = document.getElementById('questionText');
+        const optionsContainer = document.getElementById('optionsContainer');
+        const feedbackBox = document.getElementById('feedbackBox');
+        const nextBtn = document.getElementById('nextBtn');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const finalScore = document.getElementById('finalScore');
+        const finalVerdict = document.getElementById('finalVerdict');
+
+        // Функции
+        function startGame() {
+            currentQuestionIndex = 0;
+            score = 0;
+            answered = false;
+            scoreDisplay.textContent = score;
+            showScreen(screenQuestion);
+            loadQuestion();
+        }
+
+        function showScreen(screen) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            screen.classList.add('active');
+        }
+
+        function loadQuestion() {
+            answered = false;
+            nextBtn.disabled = true;
+            feedbackBox.className = 'feedback';
+            feedbackBox.innerHTML = '';
+
+            const q = questions[currentQuestionIndex];
+            scenarioText.textContent = q.scenario;
+            questionText.textContent = q.question;
+
+            optionsContainer.innerHTML = '';
+            q.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option';
+                btn.innerHTML = `<span class="letter">${String.fromCharCode(65 + index)}.</span> <span>${opt.text}</span>`;
+                btn.onclick = () => selectOption(index, btn);
+                optionsContainer.appendChild(btn);
+            });
+
+            // Обновление прогресса
+            const progress = ((currentQuestionIndex) / questions.length) * 100;
+            progressFill.style.width = progress + '%';
+            progressText.textContent = `Вопрос ${currentQuestionIndex + 1} из ${questions.length}`;
+        }
+
+        function selectOption(index, btn) {
+            if (answered) return;
+            answered = true;
+
+            const q = questions[currentQuestionIndex];
+            const isCorrect = q.options[index].correct;
+
+            // Отключить все кнопки
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.classList.add('disabled');
+                opt.onclick = null;
+            });
+
+            // Подсветка
+            if (isCorrect) {
+                btn.classList.add('selected-correct');
+                score += 10;
+                feedbackBox.className = 'feedback correct';
+                feedbackBox.innerHTML = `✅ Верно! ${q.explanation}<span class="law-ref">${q.law}</span>`;
+            } else {
+                btn.classList.add('selected-wrong');
+                score -= 5;
+                feedbackBox.className = 'feedback wrong';
+                // Найти правильный вариант для показа
+                const correctIndex = q.options.findIndex(o => o.correct);
+                const correctBtn = document.querySelectorAll('.option')[correctIndex];
+                if (correctBtn) correctBtn.classList.add('selected-correct');
+                feedbackBox.innerHTML = `❌ Неверно. ${q.explanation}<span class="law-ref">${q.law}</span>`;
+            }
+
+            scoreDisplay.textContent = score;
+            nextBtn.disabled = false;
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                loadQuestion();
+            } else {
+                endGame();
+            }
+        }
+
+        function endGame() {
+            showScreen(screenResult);
+            finalScore.textContent = score;
+
+            let verdict = '';
+            if (score >= 50) {
+                verdict = '🏆 Отличная работа! Вы — профессионал своего дела. Дело передано в суд.';
+            } else if (score >= 30) {
+                verdict = '👍 Хороший результат! Вы допустили небольшие ошибки, но дело раскрыто.';
+            } else if (score >= 10) {
+                verdict = '⚖️ Удовлетворительно. Стоит повторить УПК и УК РФ.';
+            } else {
+                verdict = '📚 Вам нужно подтянуть знания кодексов. Попробуйте ещё раз!';
+            }
+            finalVerdict.textContent = verdict;
+        }
+
+        function restartGame() {
+            startGame();
+        }
+
+        // Инициализация
+        scoreDisplay.textContent = '0';
+    </script>
+</body>
+</html>
